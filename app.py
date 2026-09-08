@@ -366,7 +366,7 @@ def pagina_descritiva(dados):
 
     esquerda, centro, direita = st.columns([1.05, 1.5, 1.05])
     with esquerda:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_descritiva_frequencia"):
             st.markdown("### Tabela de Frequência")
             bins = st.slider("Número de classes", 5, 30, 10)
             frequencias, limites = np.histogram(valores, bins=bins)
@@ -384,7 +384,7 @@ def pagina_descritiva(dados):
             )
             st.dataframe(tabela, hide_index=True, width="stretch", height=390)
     with centro:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_descritiva_distribuicao"):
             st.markdown("### Distribuição da Variável")
             fig = px.histogram(
                 x=valores,
@@ -401,27 +401,28 @@ def pagina_descritiva(dados):
             )
             st.plotly_chart(estilizar(fig_box, 160), config=CONFIGURACAO_GRAFICOS)
     with direita:
-        with st.container(border=True):
-            st.markdown("### Análise de Outliers (IQR)")
-            qcol1, qcol2 = st.columns(2)
-            qcol1.metric("Q1", formatar(q1))
-            qcol2.metric("Q3", formatar(q3))
-            qcol1.metric("IQR", formatar(iqr))
-            qcol2.metric("Outliers", f"{len(outliers):,}")
-            if outliers:
-                st.warning(f"{len(outliers):,} valores atípicos identificados.")
-            else:
-                st.success("Nenhum outlier detectado.")
-        with st.container(border=True):
-            st.markdown("### Interpretação Automática")
-            st.markdown(
-                f"""
-                - **Tendência central:** média {formatar(ms.media(valores))} e mediana {formatar(mediana)}.
-                - **Assimetria:** distribuição {assimetria} (índice {indice:.2f}).
-                - **Dispersão:** amplitude {formatar(ms.amplitude(valores))}.
-                - **Limites IQR:** {formatar(inferior)} a {formatar(superior)}.
-                """
-            )
+        with st.container(key="equal_stack_descritiva"):
+            with st.container(border=True):
+                st.markdown("### Análise de Outliers (IQR)")
+                qcol1, qcol2 = st.columns(2)
+                qcol1.metric("Q1", formatar(q1))
+                qcol2.metric("Q3", formatar(q3))
+                qcol1.metric("IQR", formatar(iqr))
+                qcol2.metric("Outliers", f"{len(outliers):,}")
+                if outliers:
+                    st.warning(f"{len(outliers):,} valores atípicos identificados.")
+                else:
+                    st.success("Nenhum outlier detectado.")
+            with st.container(border=True):
+                st.markdown("### Interpretação Automática")
+                st.markdown(
+                    f"""
+                    - **Tendência central:** média {formatar(ms.media(valores))} e mediana {formatar(mediana)}.
+                    - **Assimetria:** distribuição {assimetria} (índice {indice:.2f}).
+                    - **Dispersão:** amplitude {formatar(ms.amplitude(valores))}.
+                    - **Limites IQR:** {formatar(inferior)} a {formatar(superior)}.
+                    """
+                )
 
 
 def pagina_simulacoes(dados):
@@ -540,7 +541,7 @@ def pagina_distribuicoes(dados):
         parametros = {"Mínimo": minimo, "Máximo": maximo}
     grafico, resumo = st.columns([2.2, 1])
     with grafico:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_distribuicoes_grafico"):
             st.markdown(f"### Histograma com ajuste da {candidata}")
             fig = go.Figure()
             fig.add_bar(
@@ -563,20 +564,21 @@ def pagina_distribuicoes(dados):
             )
             st.plotly_chart(estilizar(fig, 455), config=CONFIGURACAO_GRAFICOS)
     with resumo:
-        with st.container(border=True):
-            st.markdown("### Parâmetros estimados")
-            for nome, valor in parametros.items():
-                st.metric(nome, formatar(valor, 4))
-        with st.container(border=True):
-            st.markdown("### Interpretação")
-            st.write(
-                "A qualidade do ajuste pode ser observada pela proximidade entre a "
-                "curva e as barras. Diferenças sistemáticas indicam que a candidata "
-                "não descreve completamente os dados."
-            )
-            st.warning(
-                "A comparação visual é exploratória e não substitui um teste formal de aderência."
-            )
+        with st.container(key="equal_stack_distribuicoes"):
+            with st.container(border=True):
+                st.markdown("### Parâmetros estimados")
+                for nome, valor in parametros.items():
+                    st.metric(nome, formatar(valor, 4))
+            with st.container(border=True):
+                st.markdown("### Interpretação")
+                st.write(
+                    "A qualidade do ajuste pode ser observada pela proximidade entre a "
+                    "curva e as barras. Diferenças sistemáticas indicam que a candidata "
+                    "não descreve completamente os dados."
+                )
+                st.warning(
+                    "A comparação visual é exploratória e não substitui um teste formal de aderência."
+                )
 
 
 def pagina_regressao(dados):
@@ -621,7 +623,7 @@ def pagina_regressao(dados):
 
     principal, lateral = st.columns([1.55, 1])
     with principal:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_regressao_grafico"):
             st.markdown("### Dispersão e Regressão Linear")
             amostra = pares.sample(min(5000, len(pares)), random_state=42)
             minimo, maximo = min(x), max(x)
@@ -644,30 +646,31 @@ def pagina_regressao(dados):
             )
             st.plotly_chart(estilizar(fig, 455), config=CONFIGURACAO_GRAFICOS)
     with lateral:
-        with st.container(border=True):
-            st.markdown("### Equação da Regressão Linear")
-            st.latex(rf"\hat{{y}} = {intercepto:.4f} + {inclinacao:.4f}x")
-            st.caption("Modelo calculado pelo método dos mínimos quadrados.")
-        with st.container(border=True):
-            st.markdown("### Previsão Interativa")
-            entrada = st.number_input(
-                f"Informe um valor para {x_nome}", value=float(ms.media(x))
-            )
-            st.metric(
-                f"Valor previsto de {y_nome}",
-                formatar(intercepto + inclinacao * entrada, 4),
-            )
-        with st.container(border=True):
-            st.markdown("### Interpretação dos Resultados")
-            sentido = "positiva" if correlacao >= 0 else "negativa"
-            st.write(
-                f"A associação é {sentido} e {intensidade}. A cada unidade adicional "
-                f"em {x_nome}, o valor previsto de {y_nome} varia {inclinacao:.4f}, "
-                f"em média. O modelo explica {r2 * 100:.2f}% da variação de Y."
-            )
-            st.warning(
-                "Correlação não implica causalidade. A associação não comprova que X cause Y."
-            )
+        with st.container(key="equal_stack_regressao"):
+            with st.container(border=True):
+                st.markdown("### Equação da Regressão Linear")
+                st.latex(rf"\hat{{y}} = {intercepto:.4f} + {inclinacao:.4f}x")
+                st.caption("Modelo calculado pelo método dos mínimos quadrados.")
+            with st.container(border=True):
+                st.markdown("### Previsão Interativa")
+                entrada = st.number_input(
+                    f"Informe um valor para {x_nome}", value=float(ms.media(x))
+                )
+                st.metric(
+                    f"Valor previsto de {y_nome}",
+                    formatar(intercepto + inclinacao * entrada, 4),
+                )
+            with st.container(border=True):
+                st.markdown("### Interpretação dos Resultados")
+                sentido = "positiva" if correlacao >= 0 else "negativa"
+                st.write(
+                    f"A associação é {sentido} e {intensidade}. A cada unidade adicional "
+                    f"em {x_nome}, o valor previsto de {y_nome} varia {inclinacao:.4f}, "
+                    f"em média. O modelo explica {r2 * 100:.2f}% da variação de Y."
+                )
+                st.warning(
+                    "Correlação não implica causalidade. A associação não comprova que X cause Y."
+                )
 
 
 def descobertas_calculadas(dados):
