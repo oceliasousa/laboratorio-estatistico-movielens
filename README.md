@@ -32,7 +32,7 @@ Cada observação analisada é uma avaliação. Além das colunas originais, `sr
 É recomendado Python 3.10 ou superior.
 
 ```bash
-cd laboratorio-estatistico-filmes
+cd sistematizacao
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
@@ -52,7 +52,7 @@ A tolerância adotada é `rel=1e-10` e `abs=1e-12`. Percentis usam interpolaçã
 ## Estrutura
 
 ```text
-laboratorio-estatistico-filmes/
+sistematizacao/
 ├── app.py                    # interface Streamlit
 ├── src/
 │   ├── dados.py              # preparação reprodutível
