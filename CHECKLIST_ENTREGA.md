@@ -32,7 +32,7 @@ Este arquivo separa o que já está implementado do que exige uma ação da auto
 - [x] Preencher identificação no `RELATORIO.md`.
 - [x] Iniciar o repositório Git local e organizar o histórico em commits.
 - [ ] Criar um repositório público no GitHub ou GitLab.
-- [ ] Realizar commits reais ao longo do desenvolvimento.
+- [x] Registrar núcleo, aplicação e documentação em commits separados.
 - [ ] Substituir o campo do repositório pelo endereço público definitivo.
 - [ ] Adicionar capturas ou GIF da aplicação ao `README.md`.
 - [x] Inserir a evidência dos testes aprovados no relatório.
