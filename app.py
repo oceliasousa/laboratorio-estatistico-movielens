@@ -9,6 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from scipy import stats
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src import minhastats as ms
 from src.dados import CATEGORICAS, NUMERICAS, NUMERICAS_ANALISE, carregar_dados
@@ -42,6 +43,56 @@ def carregar_estilos():
     css = (RAIZ / "styles.css").read_text(encoding="utf-8")
     css = css.replace("__HERO_IMAGE__", f"data:image/png;base64,{imagem}")
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
+
+def controlar_rolagem(pagina):
+    """Retorna ao topo somente quando a rota da aplicação muda."""
+    with st.container(key="scroll_controller"):
+        components.html(
+            f"""
+            <script>
+            (() => {{
+              const appWindow = window.parent;
+              const route = {pagina!r};
+              const storageKey = "labestat-rota-atual";
+              appWindow.history.scrollRestoration = "manual";
+
+              if (appWindow.sessionStorage.getItem(storageKey) === route) return;
+              appWindow.sessionStorage.setItem(storageKey, route);
+
+              const resetScroll = () => {{
+                const document = appWindow.document;
+                const containers = [
+                  document.scrollingElement,
+                  document.documentElement,
+                  document.body,
+                  document.querySelector('[data-testid="stAppViewContainer"]'),
+                  document.querySelector('[data-testid="stMain"]')
+                ];
+                appWindow.scrollTo(0, 0);
+                containers.forEach((container) => {{
+                  if (!container) return;
+                  container.scrollTop = 0;
+                  if (typeof container.scrollTo === "function") container.scrollTo(0, 0);
+                }});
+              }};
+
+              resetScroll();
+              let frame = 0;
+              const stabilizeAtTop = () => {{
+                resetScroll();
+                frame += 1;
+                if (frame < 24) appWindow.requestAnimationFrame(stabilizeAtTop);
+              }};
+              appWindow.requestAnimationFrame(stabilizeAtTop);
+              appWindow.setTimeout(resetScroll, 350);
+              appWindow.setTimeout(resetScroll, 800);
+            }})();
+            </script>
+            """,
+            height=0,
+            width=0,
+        )
 
 
 @st.cache_data
@@ -967,6 +1018,7 @@ paginas_validas = {
 if pagina not in paginas_validas:
     pagina = "inicio"
 
+controlar_rolagem(pagina)
 shell(pagina, dados)
 with st.container(key="page_body"):
     if pagina == "inicio":

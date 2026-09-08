@@ -40,6 +40,8 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
 html { background: var(--navy-950); }
 
 body, .stApp, [data-testid="stAppViewContainer"] {
+  overflow-anchor: none !important;
+  scroll-behavior: auto !important;
   color: var(--text);
   background:
     radial-gradient(circle at 78% 10%, rgba(71, 25, 143, .09), transparent 27%),
@@ -60,6 +62,8 @@ body, .stApp, [data-testid="stAppViewContainer"] {
 [data-testid="stMain"] {
   width: 100% !important;
   min-height: 100vh !important;
+  overflow-anchor: none !important;
+  scroll-behavior: auto !important;
 }
 
 .block-container,
@@ -80,6 +84,22 @@ body, .stApp, [data-testid="stAppViewContainer"] {
 
 .st-key-page_body {
   width: 100% !important;
+}
+
+[data-testid="stLayoutWrapper"]:has(> .st-key-scroll_controller) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.st-key-scroll_controller {
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
 }
 
 [data-testid="stMainBlockContainer"]
@@ -668,34 +688,28 @@ h2 { margin: 0; }
 [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div,
 [data-testid="stHorizontalBlock"] > [data-testid="column"] > div {
   width: 100% !important;
-  height: 100% !important;
   flex: 1 1 auto !important;
 }
 
 [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div > [data-testid="stVerticalBlock"] {
-  height: 100% !important;
+  flex: 1 1 auto !important;
 }
 
 [class*="st-key-equal_card_"] {
-  height: 100% !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
 }
 
 [data-testid="stLayoutWrapper"]:has(> [class*="st-key-equal_card_"]),
 [data-testid="stLayoutWrapper"]:has(> [class*="st-key-equal_stack_"]) {
-  height: 100% !important;
+  display: flex !important;
   flex: 1 1 auto !important;
-}
-
-[class*="st-key-equal_card_"] {
-  flex: 1 1 auto !important;
-  min-height: 100% !important;
 }
 
 /* Colunas com dois ou três cards terminam na mesma linha do card vizinho. */
 [class*="st-key-equal_stack_"] {
-  height: 100% !important;
   flex: 1 1 auto !important;
-  min-height: 100% !important;
+  min-height: 0 !important;
   justify-content: space-between !important;
 }
 
@@ -837,18 +851,7 @@ h2 { margin: 0; }
   .home-hero h1, .page-hero h1 { font-size: 31px; }
   .architecture { grid-template-columns: 1fr; }
   .architecture em { transform: rotate(90deg); text-align: center; }
-  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
-  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div,
-  [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div > [data-testid="stVerticalBlock"],
-  [class*="st-key-equal_card_"],
-  [class*="st-key-equal_stack_"],
-  [data-testid="stLayoutWrapper"]:has(> [class*="st-key-equal_card_"]),
-  [data-testid="stLayoutWrapper"]:has(> [class*="st-key-equal_stack_"]) {
-    height: auto !important;
-    min-height: 0 !important;
-  }
   [class*="st-key-equal_stack_"] {
-    height: auto !important;
     justify-content: flex-start !important;
   }
   .app-footer {
