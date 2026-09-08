@@ -212,7 +212,7 @@ def pagina_inicio(dados):
     p1, p2, p3 = st.columns(3)
     generos = dados["genero_principal"].value_counts().head(5)
     with p1:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_home_generos"):
             st.markdown("#### Distribuição por gênero")
             fig = px.pie(
                 values=generos.values,
@@ -225,7 +225,7 @@ def pagina_inicio(dados):
             )
             st.plotly_chart(estilizar(fig, 270), config=CONFIGURACAO_GRAFICOS)
     with p2:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_home_avaliacoes"):
             st.markdown("#### Distribuição das avaliações")
             fig = px.histogram(
                 dados,
@@ -236,7 +236,7 @@ def pagina_inicio(dados):
             )
             st.plotly_chart(estilizar(fig, 270), config=CONFIGURACAO_GRAFICOS)
     with p3:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_home_medias"):
             st.markdown("#### Avaliação média por gênero")
             medias = pd.DataFrame(
                 {
@@ -293,11 +293,11 @@ def pagina_descritiva(dados):
         tabela["Frequência relativa (%)"] = tabela["Frequência"] / len(dados) * 100
         esquerda, direita = st.columns([1, 1.55])
         with esquerda:
-            with st.container(border=True):
+            with st.container(border=True, key="equal_card_categoria_tabela"):
                 st.markdown("### Tabela de Frequência")
                 st.dataframe(tabela, hide_index=True, width="stretch")
         with direita:
-            with st.container(border=True):
+            with st.container(border=True, key="equal_card_categoria_grafico"):
                 fig = px.bar(
                     tabela,
                     x="Frequência",
@@ -450,7 +450,7 @@ def pagina_simulacoes(dados):
     passo = max(1, repeticoes // 2500)
     p1, p2 = st.columns(2)
     with p1:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_simulacao_lgn"):
             st.markdown("### Lei dos Grandes Números")
             st.caption("A frequência relativa converge para a probabilidade teórica.")
             fig = go.Figure()
@@ -475,7 +475,7 @@ def pagina_simulacoes(dados):
             )
             st.plotly_chart(estilizar(fig, 330), config=CONFIGURACAO_GRAFICOS)
     with p2:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_simulacao_tcl"):
             st.markdown("### Teorema Central do Limite")
             st.caption("Distribuição das médias amostrais com curva Normal estimada.")
             mu = ms.media(medias)
@@ -794,7 +794,7 @@ def pagina_dados(dados):
     )
     principal, validacao = st.columns([1.75, 1])
     with principal:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_dataset_colunas"):
             st.markdown("### Visão geral das colunas")
             catalogo = pd.DataFrame(
                 {
@@ -817,7 +817,7 @@ def pagina_dados(dados):
                 catalogo, hide_index=True, width="stretch", height=360
             )
     with validacao:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_dataset_validacao"):
             st.markdown("### Validação do dataset")
             st.success("✓ Dataset carregado com sucesso")
             st.success("✓ Possui pelo menos 1.000 registros")
@@ -841,7 +841,7 @@ def pagina_sobre():
     )
     sobre, objetivos = st.columns([1.15, 1])
     with sobre:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_sobre_resumo"):
             st.markdown("### ⓘ Sobre o Projeto")
             st.write(
                 "O Laboratório Estatístico Interativo é uma aplicação acadêmica "
@@ -853,7 +853,7 @@ def pagina_sobre():
             b.metric("Abordagem", "Prática")
             c.metric("Dados", "Reais")
     with objetivos:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_sobre_objetivos"):
             st.markdown("### Objetivos do Trabalho")
             st.success("✓ Dados reais: MovieLens")
             st.success("✓ Núcleo estatístico próprio")
@@ -864,7 +864,7 @@ def pagina_sobre():
 
     arquitetura, executar = st.columns([1.25, 1])
     with arquitetura:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_sobre_arquitetura"):
             st.markdown("### Arquitetura da Aplicação")
             st.markdown(
                 """
@@ -887,7 +887,7 @@ def pagina_sobre():
                 language="python",
             )
     with executar:
-        with st.container(border=True):
+        with st.container(border=True, key="equal_card_sobre_execucao"):
             st.markdown("### Como Executar")
             st.markdown(
                 """

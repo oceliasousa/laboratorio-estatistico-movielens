@@ -420,11 +420,14 @@ h2 { margin: 0; }
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  grid-auto-rows: 1fr;
   gap: 12px;
   margin: 14px 0 15px;
 }
 
 .metric-grid article {
+  height: 100%;
   min-height: 94px;
   display: flex;
   align-items: center;
@@ -483,11 +486,14 @@ h2 { margin: 0; }
 .module-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  grid-auto-rows: 1fr;
   gap: 10px 12px;
   margin: 8px 0 5px;
 }
 
 .module-grid > a {
+  height: 100%;
   min-height: 78px;
   display: flex;
   align-items: center;
@@ -594,6 +600,34 @@ h2 { margin: 0; }
 .architecture em { color: #b2cae2; font-style: normal; }
 
 /* Componentes do Streamlit */
+[data-testid="stHorizontalBlock"] {
+  align-items: stretch !important;
+}
+
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+  min-width: 0 !important;
+  align-self: stretch !important;
+}
+
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"] > div,
+[data-testid="stHorizontalBlock"] > [data-testid="column"] > div {
+  width: 100% !important;
+}
+
+[class*="st-key-equal_card_"] {
+  height: 100% !important;
+}
+
+[class*="st-key-equal_card_"] > [data-testid="stVerticalBlockBorderWrapper"],
+[class*="st-key-equal_card_"] > div,
+[class*="st-key-equal_card_"] [data-testid="stVerticalBlockBorderWrapper"] {
+  height: 100% !important;
+}
+
+[class*="st-key-equal_card_"] [data-testid="stVerticalBlock"] {
+  min-height: 100% !important;
+}
+
 [data-testid="stVerticalBlockBorderWrapper"] {
   border-color: var(--line) !important;
   border-radius: 10px !important;
@@ -602,6 +636,7 @@ h2 { margin: 0; }
 }
 
 [data-testid="stMetric"] {
+  height: 100%;
   min-height: 92px;
   padding: 13px 15px;
   border: 1px solid var(--line);
@@ -610,6 +645,11 @@ h2 { margin: 0; }
 }
 
 [data-testid="stMetricLabel"] { color: #9eb1c9; }
+[data-testid="stMetricLabel"] {
+  min-height: 30px;
+  display: flex;
+  align-items: flex-end;
+}
 [data-testid="stMetricValue"] { color: #f6f8fc; font-size: 25px; }
 [data-testid="stMetricDelta"] { color: #21d8b4; }
 
