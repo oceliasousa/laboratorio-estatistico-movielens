@@ -382,7 +382,7 @@ def pagina_descritiva(dados):
                     ],
                 }
             )
-            st.dataframe(tabela, hide_index=True, width="stretch", height=390)
+            st.dataframe(tabela, hide_index=True, width="stretch", height=460)
     with centro:
         with st.container(border=True, key="equal_card_descritiva_distribuicao"):
             st.markdown("### Distribuição da Variável")
@@ -393,13 +393,13 @@ def pagina_descritiva(dados):
                 color_discrete_sequence=["#526fff"],
                 title=f"Histograma de {coluna}",
             )
-            st.plotly_chart(estilizar(fig, 260), config=CONFIGURACAO_GRAFICOS)
+            st.plotly_chart(estilizar(fig, 300), config=CONFIGURACAO_GRAFICOS)
             fig_box = px.box(
                 x=valores,
                 labels={"x": coluna},
                 color_discrete_sequence=["#21cfe2"],
             )
-            st.plotly_chart(estilizar(fig_box, 160), config=CONFIGURACAO_GRAFICOS)
+            st.plotly_chart(estilizar(fig_box, 190), config=CONFIGURACAO_GRAFICOS)
     with direita:
         with st.container(key="equal_stack_descritiva"):
             with st.container(border=True):
@@ -644,7 +644,7 @@ def pagina_regressao(dados):
                 name="Reta de regressão",
                 line=dict(color="#9e55ff", width=4),
             )
-            st.plotly_chart(estilizar(fig, 455), config=CONFIGURACAO_GRAFICOS)
+            st.plotly_chart(estilizar(fig, 620), config=CONFIGURACAO_GRAFICOS)
     with lateral:
         with st.container(key="equal_stack_regressao"):
             with st.container(border=True):
@@ -858,14 +858,21 @@ def pagina_sobre():
     with objetivos:
         with st.container(border=True, key="equal_card_sobre_objetivos"):
             st.markdown("### Objetivos do Trabalho")
-            st.success("✓ Dados reais: MovieLens")
-            st.success("✓ Núcleo estatístico próprio")
-            st.success("✓ Estatística descritiva interativa")
-            st.success("✓ Probabilidade e simulação")
-            st.success("✓ Distribuições e regressão")
-            st.success("✓ Relatório de descobertas")
+            st.markdown(
+                """
+                <div class="objective-grid">
+                  <div class="objective-item"><span>✓</span>Dados reais: MovieLens</div>
+                  <div class="objective-item"><span>✓</span>Núcleo estatístico próprio</div>
+                  <div class="objective-item"><span>✓</span>Estatística descritiva</div>
+                  <div class="objective-item"><span>✓</span>Probabilidade e simulação</div>
+                  <div class="objective-item"><span>✓</span>Distribuições e regressão</div>
+                  <div class="objective-item"><span>✓</span>Relatório de descobertas</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-    arquitetura, executar = st.columns([1.25, 1])
+    arquitetura, executar = st.columns([1.15, 1])
     with arquitetura:
         with st.container(border=True, key="equal_card_sobre_arquitetura"):
             st.markdown("### Arquitetura da Aplicação")
@@ -881,13 +888,26 @@ def pagina_sobre():
                 unsafe_allow_html=True,
             )
             st.markdown("### Núcleo estatístico")
-            st.code(
-                "media(dados)\nmediana(dados)\nmoda(dados)\namplitude(dados)\n"
-                "variancia_populacional(dados)\nvariancia_amostral(dados)\n"
-                "desvio_padrao_populacional(dados)\ndesvio_padrao_amostral(dados)\n"
-                "percentil(dados, p)\nquartis(dados)\ncoeficiente_variacao(dados)\n"
-                "covariancia(x, y)\ncorrelacao_pearson(x, y)\nregressao_linear(x, y)",
-                language="python",
+            st.markdown(
+                """
+                <div class="function-grid">
+                  <code>media(dados)</code>
+                  <code>mediana(dados)</code>
+                  <code>moda(dados)</code>
+                  <code>amplitude(dados)</code>
+                  <code>variancia_populacional(dados)</code>
+                  <code>variancia_amostral(dados)</code>
+                  <code>desvio_padrao_populacional(dados)</code>
+                  <code>desvio_padrao_amostral(dados)</code>
+                  <code>percentil(dados, p)</code>
+                  <code>quartis(dados)</code>
+                  <code>coeficiente_variacao(dados)</code>
+                  <code>covariancia(x, y)</code>
+                  <code>correlacao_pearson(x, y)</code>
+                  <code>regressao_linear(x, y)</code>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
     with executar:
         with st.container(border=True, key="equal_card_sobre_execucao"):
@@ -907,6 +927,11 @@ def pagina_sobre():
             )
             st.caption(
                 "README.md, RELATORIO.md, roteiro do vídeo e checklist estão na raiz do projeto."
+            )
+            st.markdown("### Validação")
+            st.markdown(
+                "- Execute `pytest -q` para validar o núcleo estatístico.\n"
+                "- Resultado atual: **12 testes aprovados**."
             )
 
 
