@@ -14,6 +14,15 @@ O MovieLens foi escolhido por ser público, documentado e representar comportame
 
 A unidade de análise é uma avaliação. Os dados originais (`ratings.csv` e `movies.csv`) são unidos por `movieId`. Foram derivadas as variáveis ano do filme, ano da avaliação, gênero principal, quantidade de gêneros e faixa de avaliação. IDs são disponibilizados para exploração, mas devem ser interpretados como identificadores, não como grandezas quantitativas.
 
+As variáveis usadas diretamente nas análises atendem aos requisitos mínimos:
+
+| Tipo | Variáveis |
+|---|---|
+| Numéricas | `rating`, `ano_filme`, `ano_avaliacao`, `quantidade_generos` |
+| Categóricas | `title`, `genres`, `genero_principal`, `faixa_avaliacao` |
+
+A base preparada possui **100.836 registros**, **11 colunas**, **4 variáveis categóricas** e **7 colunas numéricas** no total. Identificadores e timestamp permanecem disponíveis para rastreabilidade, mas não são tratados como grandezas nas interpretações estatísticas.
+
 ## 3. Núcleo estatístico próprio
 
 O arquivo `src/minhastats.py` converte entradas em listas e executa explicitamente somas, ordenação, contagens e interpolações. Nenhuma função pronta de estatística é usada nos valores apresentados ao usuário.
@@ -66,7 +75,18 @@ Comando de validação:
 pytest
 ```
 
-Resultado obtido: **12 testes aprovados**.
+Resultado obtido em 07/09/2026: **12 testes aprovados**.
+
+| Grupo validado | Referência |
+|---|---|
+| Média, mediana, amplitude, variâncias e desvios | NumPy |
+| Moda | SciPy |
+| Percentis e quartis | NumPy |
+| Coeficiente de variação e covariância | NumPy |
+| Correlação de Pearson | SciPy |
+| Regressão linear e R² | SciPy/NumPy |
+
+Além dos testes do núcleo, as oito rotas da interface (`inicio`, `descritiva`, `simulacoes`, `distribuicoes`, `regressao`, `descobertas`, `dados` e `sobre`) foram executadas com o mecanismo de testes do Streamlit e não apresentaram exceções.
 
 ![Evidência dos testes automatizados](docs/images/testes-pytest.png)
 
@@ -96,6 +116,10 @@ O histograma em densidade pode ser comparado às curvas Normal, Exponencial e Un
 
 O usuário escolhe X e Y. Todos os pares válidos entram no cálculo próprio de Pearson e mínimos quadrados; até 5.000 pontos são amostrados somente para tornar o gráfico legível. A tela fornece equação, R², predição e o alerta de não causalidade.
 
+### Módulo 6 — Relatório de descobertas
+
+Reúne três conclusões calculadas a partir do mesmo conjunto de dados usado nos demais módulos. Cada descoberta apresenta indicadores numéricos, gráfico correspondente, evidências e uma interpretação que evita afirmações causais indevidas.
+
 ## 6. Três descobertas estatísticas
 
 ### 1. As avaliações se concentram acima do ponto médio
@@ -120,13 +144,20 @@ Como verificação adicional, entre filmes com pelo menos 100 avaliações, *The
 - Correlação e regressão simples não estabelecem causalidade.
 - IDs não devem receber interpretação métrica, embora permaneçam disponíveis para fins didáticos.
 
-## 8. Evidências visuais e vídeo
+## 8. Evidências e reprodutibilidade
 
-O resultado dos testes está registrado na Seção 4. Ainda é necessário salvar capturas atuais das telas da aplicação e gravar o vídeo de demonstração.
+O resultado dos testes está registrado na Seção 4 e na imagem `docs/images/testes-pytest.png`. A execução pode ser reproduzida com os comandos documentados no `README.md`.
+
+O repositório Git local possui commits separados para o núcleo estatístico e preparação dos dados, a aplicação Streamlit, a documentação e a validação final. Essa separação facilita a identificação da evolução técnica do projeto.
+
+Materiais externos que ainda dependem de publicação:
 
 - **Vídeo:** aguardando gravação e publicação.
 - **Repositório público:** aguardando criação e publicação.
+- **Capturas da aplicação:** aguardando salvamento dos arquivos atuais em `docs/images/`.
+
+Depois que os links forem informados, o script `scripts/gerar_pdf_entrega.py` cria o arquivo definitivo `SISTEMATIZACAO_MEC_OceliaAssisDeSousa.pdf`. A prévia já foi gerada e revisada visualmente.
 
 ## 9. Conclusão
 
-O laboratório liga fórmulas a implementações verificáveis e permite observar empiricamente convergência, distribuição amostral, ajuste teórico e associação. A validação automatizada reduz o risco de erros no núcleo, enquanto a interface torna hipóteses e limitações acessíveis ao usuário.
+O laboratório liga fórmulas a implementações verificáveis e permite observar empiricamente convergência, distribuição amostral, ajuste teórico e associação. A validação automatizada reduz o risco de erros no núcleo, enquanto a interface torna hipóteses e limitações acessíveis ao usuário. Os módulos técnicos e a documentação acadêmica estão concluídos; restam somente a publicação do repositório, as capturas atuais da interface e a gravação do vídeo.
