@@ -99,6 +99,102 @@ def controlar_rolagem(pagina):
         )
 
 
+def iniciar_carregamento(pagina):
+    """Exibe uma transição curta apenas ao abrir ou trocar de página."""
+    titulos = {
+        "inicio": "Preparando o laboratório",
+        "descritiva": "Carregando estatística descritiva",
+        "simulacoes": "Preparando as simulações",
+        "distribuicoes": "Carregando distribuições teóricas",
+        "regressao": "Calculando correlação e regressão",
+        "descobertas": "Organizando as descobertas",
+        "dados": "Carregando o dataset",
+        "sobre": "Carregando a documentação",
+    }
+    titulo = titulos.get(pagina, "Carregando página")
+    with st.container(key="page_loader_start"):
+        components.html(
+            f"""
+            <script>
+            (() => {{
+              const appWindow = window.parent;
+              const document = appWindow.document;
+              const route = {pagina!r};
+              const firstRender = !appWindow.__labestatLoaderInitialized;
+              const routeChanged = appWindow.__labestatLoaderRoute !== route;
+
+              appWindow.__labestatLoaderInitialized = true;
+              appWindow.__labestatLoaderRoute = route;
+              if (!firstRender && !routeChanged) return;
+
+              document.getElementById("labestat-page-loader")?.remove();
+              const loader = document.createElement("div");
+              loader.id = "labestat-page-loader";
+              loader.setAttribute("role", "status");
+              loader.setAttribute("aria-live", "polite");
+              loader.innerHTML = `
+                <div class="loader-panel">
+                  <div class="loader-symbol">∑</div>
+                  <div class="loader-copy">
+                    <strong>{titulo}</strong>
+                    <span>LabEstat</span>
+                  </div>
+                  <div class="loader-track"><i></i></div>
+                </div>`;
+              document.body.appendChild(loader);
+              appWindow.__labestatLoaderStarted = appWindow.performance.now();
+              appWindow.requestAnimationFrame(() => loader.classList.add("is-visible"));
+            }})();
+            </script>
+            """,
+            height=0,
+            width=0,
+        )
+
+
+def finalizar_carregamento():
+    """Remove o carregamento depois que os componentes visuais foram montados."""
+    with st.container(key="page_loader_finish"):
+        components.html(
+            """
+            <script>
+            (() => {
+              const appWindow = window.parent;
+              const document = appWindow.document;
+              let attempts = 0;
+
+              const finish = () => {
+                const loader = document.getElementById("labestat-page-loader");
+                if (!loader) return;
+                const elapsed = appWindow.performance.now()
+                  - (appWindow.__labestatLoaderStarted || 0);
+                const remaining = Math.max(0, 520 - elapsed);
+                appWindow.setTimeout(() => {
+                  loader.classList.add("is-ready");
+                  appWindow.setTimeout(() => loader.remove(), 260);
+                }, remaining);
+              };
+
+              const waitForCharts = () => {
+                const charts = [...document.querySelectorAll('[data-testid="stPlotlyChart"]')];
+                const pending = charts.some((chart) => !chart.querySelector(".js-plotly-plot"));
+                if (pending && attempts++ < 30) {
+                  appWindow.setTimeout(waitForCharts, 40);
+                  return;
+                }
+                appWindow.requestAnimationFrame(() =>
+                  appWindow.requestAnimationFrame(finish));
+              };
+
+              waitForCharts();
+            })();
+            </script>
+            """,
+            height=0,
+            width=0,
+        )
+
+
 @st.cache_data
 def dados_completos():
     return carregar_dados()
@@ -1008,7 +1104,6 @@ def rodape():
 
 
 carregar_estilos()
-dados = dados_completos()
 pagina = st.query_params.get("page", "inicio")
 paginas_validas = {
     "inicio",
@@ -1024,6 +1119,8 @@ if pagina not in paginas_validas:
     pagina = "inicio"
 
 controlar_rolagem(pagina)
+iniciar_carregamento(pagina)
+dados = dados_completos()
 shell(pagina, dados)
 with st.container(key="page_body"):
     if pagina == "inicio":
@@ -1043,3 +1140,4 @@ with st.container(key="page_body"):
     else:
         pagina_sobre()
 rodape()
+finalizar_carregamento()
