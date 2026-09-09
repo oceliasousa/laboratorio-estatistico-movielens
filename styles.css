@@ -722,11 +722,24 @@ h2 { margin: 0; }
 
 [data-testid="stMetric"] {
   height: 100%;
+  flex: 1 1 auto;
   min-height: 92px;
   padding: 13px 15px;
   border: 1px solid var(--line);
   border-radius: 9px;
   background: linear-gradient(145deg, rgba(10, 30, 51, .95), rgba(7, 20, 36, .96));
+}
+
+[data-testid="stElementContainer"]:has(> [data-testid="stMetric"]) {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  align-self: stretch !important;
+  height: 100% !important;
+}
+
+[data-testid="stHorizontalBlock"] > [data-testid="stColumn"] [data-testid="stMetric"] {
+  width: 100% !important;
+  min-height: 100% !important;
 }
 
 [data-testid="stMetricLabel"] { color: #9eb1c9; }
