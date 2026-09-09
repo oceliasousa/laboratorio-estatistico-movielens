@@ -104,7 +104,7 @@ body, .stApp, [data-testid="stAppViewContainer"] {
 
 [data-testid="stMainBlockContainer"]
   > [data-testid="stVerticalBlock"]
-  > div:last-child {
+  > [data-testid="stLayoutWrapper"]:has(> .st-key-page_footer) {
   margin-top: auto !important;
 }
 

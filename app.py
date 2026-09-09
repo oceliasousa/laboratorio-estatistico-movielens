@@ -991,19 +991,20 @@ def pagina_sobre():
 
 
 def rodape():
-    st.markdown(
-        """
-        <footer class="app-footer">
-          <strong>∑&nbsp; LabEstat</strong>
-          <span>Projeto acadêmico • Reproduzível com Python + Streamlit</span>
-          <nav>
-            <a href="https://grouplens.org/datasets/movielens/latest/" target="_blank">Dataset: MovieLens ↗</a>
-            <a href="?page=sobre" target="_self">Documentação</a>
-          </nav>
-        </footer>
-        """,
-        unsafe_allow_html=True,
-    )
+    with st.container(key="page_footer"):
+        st.markdown(
+            """
+            <footer class="app-footer">
+              <strong>∑&nbsp; LabEstat</strong>
+              <span>Projeto acadêmico • Reproduzível com Python + Streamlit</span>
+              <nav>
+                <a href="https://grouplens.org/datasets/movielens/latest/" target="_blank">Dataset: MovieLens ↗</a>
+                <a href="?page=sobre" target="_self">Documentação</a>
+              </nav>
+            </footer>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 carregar_estilos()
