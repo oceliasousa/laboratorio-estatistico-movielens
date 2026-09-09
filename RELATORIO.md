@@ -10,7 +10,7 @@
 
 ## 2. Dataset e justificativa
 
-O MovieLens foi escolhido por ser público, documentado e representar comportamento real de usuários. A versão utilizada reúne 100.836 avaliações de 9.742 filmes feitas por 610 usuários entre 1996 e 2018. O tema permite investigar tendências, dispersão, associação e distribuições com uma escala adequada para simulações.
+O MovieLens foi escolhido por ser público, documentado e representar comportamento real de usuários. A versão utilizada reúne 100.836 avaliações de **9.724 filmes avaliados**, feitas por 610 usuários entre 1996 e 2018. O catálogo original contém **9.742 filmes**; 18 deles não possuem avaliação nessa tabela. O tema permite investigar dispersão, associação e distribuições com uma escala adequada para simulações.
 
 A unidade de análise é uma avaliação. Os dados originais (`ratings.csv` e `movies.csv`) são unidos por `movieId`. Foram derivadas as variáveis ano do filme, ano da avaliação, gênero principal, quantidade de gêneros e faixa de avaliação. IDs são disponibilizados para exploração, mas devem ser interpretados como identificadores, não como grandezas quantitativas.
 
@@ -23,9 +23,15 @@ As variáveis usadas diretamente nas análises atendem aos requisitos mínimos:
 
 A base preparada possui **100.836 registros**, **11 colunas**, **4 variáveis categóricas** e **7 colunas numéricas** no total. Identificadores e timestamp permanecem disponíveis para rastreabilidade, mas não são tratados como grandezas nas interpretações estatísticas.
 
+O marcador `(no genres listed)` significa ausência de gênero listado. Para `quantidade_generos`, ele recebe **zero**, e não um: são 47 avaliações de 34 filmes. O campo categórico preserva o marcador original. O cache é invalidado quando mudam os CSVs ou as regras de preparação.
+
 ## 3. Núcleo estatístico próprio
 
 O arquivo `src/minhastats.py` converte entradas em listas e executa explicitamente somas, ordenação, contagens e interpolações. Nenhuma função pronta de estatística é usada nos valores apresentados ao usuário.
+
+Na refatoração, `app.py` passou a cuidar somente da configuração, carga, escolha da rota e tratamento de erros. `src/paginas/` reúne as oito telas; `src/ui/` centraliza layout, formatação, gráficos e carregamento; `src/analises.py` oferece funções testáveis para frequências, IQR, simulações, densidades e resultados da regressão. As funções de análise independem do Streamlit.
+
+Entradas vazias, não numéricas, NaN e infinitos são rejeitados pelo núcleo. Iteradores são materializados uma vez para evitar consumo indevido. A média usa `math.fsum` para a soma em ponto flutuante. CV com média zero, Pearson com variável constante e R² com Y constante são recusados com mensagens explícitas.
 
 Para observações \(x_1,\ldots,x_n\):
 
@@ -75,16 +81,17 @@ Comando de validação:
 pytest
 ```
 
-Resultado obtido em 07/09/2026: **12 testes aprovados**.
+Resultado da refatoração em 09/09/2026: **81 testes aprovados**. O detalhamento e o ambiente estão em [docs/VALIDACAO.md](docs/VALIDACAO.md). A suíte inclui testes do núcleo, das análises, da preparação dos dados, das oito rotas e de estados interativos.
 
 | Grupo validado | Referência |
 |---|---|
 | Média, mediana, amplitude, variâncias e desvios | NumPy |
-| Moda | SciPy |
+| Moda, incluindo empates | SciPy e `statistics.multimode` |
 | Percentis e quartis | NumPy |
-| Coeficiente de variação e covariância | NumPy |
-| Correlação de Pearson | SciPy |
+| Coeficiente de variação | SciPy |
+| Covariância e correlação de Pearson | NumPy e SciPy |
 | Regressão linear e R² | SciPy/NumPy |
+| Frequências e densidades Normal, Exponencial e Uniforme próprias | NumPy e SciPy |
 
 Além dos testes do núcleo, as oito rotas da interface (`inicio`, `descritiva`, `simulacoes`, `distribuicoes`, `regressao`, `descobertas`, `dados` e `sobre`) foram executadas com o mecanismo de testes do Streamlit e não apresentaram exceções.
 
@@ -104,13 +111,25 @@ Documenta todas as funções estatísticas exigidas, as bibliotecas usadas como 
 
 O usuário seleciona uma variável. Para numéricas, vê as medidas próprias, frequências em classes, histograma, boxplot, assimetria de Pearson e outliers por IQR. Para categóricas, vê frequências absoluta/relativa e gráfico de barras.
 
+Tabela e histograma compartilham a mesma contagem própria e as mesmas bordas: classes fechadas à esquerda e abertas à direita, exceto a última, fechada dos dois lados. O boxplot recebe Q1, mediana, Q3 e bigodes já calculados pelo núcleo. A tabela categórica inclui todas as categorias; somente o gráfico limita a visualização às 20 mais frequentes. Para `rating`, Q1 = 3, Q3 = 4 e IQR = 1: há **4.181 observações** abaixo do limite inferior 1,5.
+
 ### Módulo 3 — Simulação
 
 Na Lei dos Grandes Números, lançamentos de moeda mostram a frequência de caras convergindo para 0,5. No TCL, amostras com reposição de uma variável geram médias calculadas pelo núcleo próprio; tamanho, repetições e semente são controláveis.
 
+A referência do TCL usa a média da população empírica e seu desvio populacional dividido por √n, em vez de ajustar a curva às próprias médias simuladas. Os resultados da simulação ficam em cache por dados e parâmetros. A proximidade da Normal pode ser examinada repetindo a simulação com n = 5, 30 e 100; não é uma garantia de aproximação perfeita para toda amostra.
+
 ### Módulo 4 — Distribuições
 
 O histograma em densidade pode ser comparado às curvas Normal, Exponencial e Uniforme. Seus parâmetros são estimados a partir dos dados. A avaliação é visual e explicitamente apresentada como exploratória.
+
+As densidades também são próprias, em `src/analises.py`:
+
+$$f_N(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac12((x-\mu)/\sigma)^2}$$
+
+$$f_E(x)=\frac{1}{\theta}e^{-(x-a)/\theta},\ x\ge a;\qquad f_U(x)=\frac{1}{b-a},\ a\le x\le b$$
+
+Fora do suporte, as densidades Exponencial e Uniforme são zero. Na Normal, μ e σ vêm do núcleo. Na Exponencial deslocada, a é o mínimo e θ é a média de x − a. Na Uniforme, a e b são os extremos observados. Essas curvas aproximam variáveis discretas/discretizadas; não implicam que notas ou anos sejam tempos de espera ou medidas contínuas.
 
 ### Módulo 5 — Correlação e regressão
 
@@ -122,19 +141,19 @@ Reúne três conclusões calculadas a partir do mesmo conjunto de dados usado no
 
 ## 6. Três descobertas estatísticas
 
-### 1. As avaliações se concentram acima do ponto médio
+### 1. Ação e Comédia lideram em volume
 
-A nota média é **3,5016** e a mediana é **3,5** na escala de 0,5 a 5. Isso indica que o centro das avaliações está acima do ponto médio teórico (2,75), embora não permita concluir por que usuários selecionam ou avaliam filmes dessa maneira.
+Considerando o primeiro gênero listado, **Ação possui 30.635 avaliações** e **Comédia, 25.217**. Juntas, representam **55,39%** das 100.836 avaliações. O resultado mede volume de avaliações, não quantidade distinta de filmes ou preferência causal.
 
-### 2. Ação domina em volume de avaliações
+### 2. As avaliações se concentram entre 3 e 5
 
-Considerando o primeiro gênero listado como gênero principal, **Ação possui 30.635 avaliações**, seguida por Comédia (25.217) e Drama (17.068). O resultado mede volume de avaliações, não necessariamente quantidade distinta de filmes ou preferência causal.
+**81,09%** das notas estão entre 3 e 5 estrelas, inclusive. A nota média é **3,5016** e a mediana é **3,5** na escala de 0,5 a 5. O centro fica acima do ponto médio teórico (2,75), sem permitir concluir por que usuários selecionam ou avaliam filmes dessa maneira.
 
 ### 3. Ano de lançamento explica muito pouco da nota individual
 
-A correlação de Pearson entre ano do filme e nota é **−0,0840**. O sinal é levemente negativo, mas a magnitude é muito pequena: uma regressão simples baseada apenas no ano terá poder explicativo baixo. Similarmente, quantidade de gêneros e nota têm \(r=0{,}0355\). Logo, metadados estruturais isolados não explicam bem a avaliação individual.
+A correlação de Pearson entre ano do filme e nota é **−0,0840**. O sinal é levemente negativo, mas a magnitude é muito pequena: uma regressão simples baseada apenas no ano tem poder explicativo baixo.
 
-Como verificação adicional, entre filmes com pelo menos 100 avaliações, *The Shawshank Redemption (1994)* apresenta a maior média (**4,4290**, 317 avaliações). O limiar evita destacar filmes vistos por pouquíssimos usuários.
+Na regressão de ano do filme para nota, **R² = 0,007064**, aproximadamente **0,71%** da variação das notas. Essas três descobertas são as mesmas apresentadas na tela Relatório de Descobertas e no resumo executivo.
 
 ## 7. Limitações e ética
 
@@ -143,6 +162,9 @@ Como verificação adicional, entre filmes com pelo menos 100 avaliações, *The
 - `genero_principal` depende da ordem fornecida no arquivo.
 - Correlação e regressão simples não estabelecem causalidade.
 - IDs não devem receber interpretação métrica, embora permaneçam disponíveis para fins didáticos.
+- CV em anos e notas é didático: essas escalas não possuem zero absoluto e não justificam comparação proporcional de dispersão.
+- Índice de assimetria próximo de zero não comprova simetria; histogramas e boxplots complementam a interpretação.
+- A validação por tipos e contagens não elimina problemas de representatividade ou dependência entre observações.
 
 ## 8. Evidências e reprodutibilidade
 
@@ -154,10 +176,46 @@ Materiais externos que ainda dependem de publicação:
 
 - **Vídeo:** aguardando gravação e publicação.
 - **Repositório público:** aguardando criação e publicação.
-- **Capturas da aplicação:** aguardando salvamento dos arquivos atuais em `docs/images/`.
+- **Capturas da aplicação:** registradas após a refatoração em `docs/images/`.
 
 Depois que os links forem informados, o script `scripts/gerar_pdf_entrega.py` cria o arquivo definitivo `SISTEMATIZACAO_MEC_OceliaAssisDeSousa.pdf`. A prévia já foi gerada e revisada visualmente.
 
-## 9. Conclusão
+## 9. Capturas atuais dos módulos
 
-O laboratório liga fórmulas a implementações verificáveis e permite observar empiricamente convergência, distribuição amostral, ajuste teórico e associação. A validação automatizada reduz o risco de erros no núcleo, enquanto a interface torna hipóteses e limitações acessíveis ao usuário. Os módulos técnicos e a documentação acadêmica estão concluídos; restam somente a publicação do repositório, as capturas atuais da interface e a gravação do vídeo.
+As capturas abaixo foram feitas no navegador em 09/09/2026, após a refatoração.
+
+### Início
+
+![Início](docs/images/inicio.png)
+
+### Dados reais — módulo 0
+
+![Dataset](docs/images/dados.png)
+
+### Núcleo e documentação — módulo 1
+
+![Documentação](docs/images/sobre.png)
+
+### Descritiva — módulo 2
+
+![Descritiva](docs/images/descritiva.png)
+
+### Simulação — módulo 3
+
+![Simulações](docs/images/simulacoes.png)
+
+### Distribuições — módulo 4
+
+![Distribuições](docs/images/distribuicoes.png)
+
+### Regressão — módulo 5
+
+![Regressão](docs/images/regressao.png)
+
+### Descobertas — módulo 6
+
+![Descobertas](docs/images/descobertas.png)
+
+## 10. Situação da entrega
+
+Os módulos técnicos, testes e evidências locais estão implementados. A entrega ainda exige publicação do repositório público, gravação/publicação do vídeo, preenchimento dos links e geração do PDF definitivo. A autora deve verificar os links em janela anônima, confirmar o prazo no ambiente virtual e efetuar o envio. O enunciado fornecido contém apenas o marcador `[DATA/HORA]`, sem prazo preenchido.

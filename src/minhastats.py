@@ -5,7 +5,7 @@ linear, equivalente ao método ``linear`` padrão do NumPy. Variâncias adotam
 denominador N (população) ou N-1 (amostra).
 """
 
-from math import sqrt
+from math import fsum, isfinite, sqrt
 from numbers import Real
 
 
@@ -15,12 +15,15 @@ def _valores(dados):
         raise ValueError("A amostra não pode ser vazia.")
     if any(not isinstance(x, Real) for x in valores):
         raise TypeError("Todos os valores devem ser numéricos.")
-    return [float(x) for x in valores]
+    valores = [float(x) for x in valores]
+    if not all(isfinite(x) for x in valores):
+        raise ValueError("Os valores devem ser finitos (sem NaN ou infinito).")
+    return valores
 
 
 def media(dados):
     valores = _valores(dados)
-    return sum(valores) / len(valores)
+    return fsum(valores) / len(valores)
 
 
 def mediana(dados):
@@ -80,14 +83,16 @@ def percentil(dados, p):
 
 
 def quartis(dados):
-    return percentil(dados, 25), percentil(dados, 50), percentil(dados, 75)
+    valores = _valores(dados)
+    return tuple(percentil(valores, p) for p in (25, 50, 75))
 
 
 def coeficiente_variacao(dados, amostral=True):
-    centro = media(dados)
+    valores = _valores(dados)
+    centro = media(valores)
     if centro == 0:
         raise ValueError("O coeficiente de variação não é definido para média zero.")
-    desvio = desvio_padrao_amostral(dados) if amostral else desvio_padrao_populacional(dados)
+    desvio = desvio_padrao_amostral(valores) if amostral else desvio_padrao_populacional(valores)
     return desvio / abs(centro) * 100
 
 
@@ -127,6 +132,8 @@ def regressao_linear(x, y):
     previstos = [intercepto + inclinacao * a for a in valores_x]
     sq_total = sum((b - my) ** 2 for b in valores_y)
     sq_residuos = sum((b - previsto) ** 2 for b, previsto in zip(valores_y, previstos))
-    r2 = 1 - sq_residuos / sq_total if sq_total else 1.0
+    # Sem variação em Y, não há uma proporção de variância a explicar.
+    if sq_total == 0:
+        raise ValueError("R² não é definido para variável Y constante.")
+    r2 = 1 - sq_residuos / sq_total
     return inclinacao, intercepto, r2
-

@@ -7,7 +7,9 @@ enviado. Quando ambos forem informados, o nome final exigido é usado.
 from __future__ import annotations
 
 import argparse
+from html import escape
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -54,7 +56,10 @@ def rodape(canvas, documento) -> None:
 
 def link_paragrafo(rotulo: str, url: str, estilo: ParagraphStyle) -> Paragraph:
     if url:
-        valor = f'<link href="{url}" color="#1769E0"><u>{url}</u></link>'
+        if urlsplit(url).scheme not in ("http", "https") or not urlsplit(url).netloc:
+            raise ValueError(f"URL inválida: {rotulo}")
+        url_segura = escape(url, quote=True)
+        valor = f'<link href="{url_segura}" color="#1769E0"><u>{url_segura}</u></link>'
     else:
         valor = "Não informado - esta prévia ainda não está pronta para envio."
     return Paragraph(f"<b>{rotulo}:</b> {valor}", estilo)
@@ -190,7 +195,7 @@ def gerar(repositorio: str, video: str) -> Path:
             Paragraph(
                 "O projeto utiliza o MovieLens Latest Small, conjunto público do GroupLens. "
                 "A unidade de análise é uma avaliação de filme. Após a preparação "
-                "reprodutível, a base reúne 100.836 avaliações, 9.742 filmes, 11 colunas, "
+                "reprodutível, a base reúne 100.836 avaliações de 9.724 filmes (9.742 no catálogo), 11 colunas, "
                 "quatro variáveis categóricas e sete colunas numéricas. Para as análises "
                 "estatísticas são usadas quatro grandezas numéricas válidas, além das "
                 "variáveis categóricas derivadas.",
@@ -205,19 +210,19 @@ def gerar(repositorio: str, video: str) -> Path:
                 "frequências, histogramas, boxplots, outliers pelo IQR, simulações da Lei "
                 "dos Grandes Números e do Teorema Central do Limite, ajustes Normal, "
                 "Exponencial e Uniforme, regressão com R² e predição interativa. As funções "
-                "foram comparadas com NumPy e SciPy em 12 testes automatizados aprovados.",
+                "foram comparadas com NumPy e SciPy em testes automatizados. Os resultados "
+                "da execução estão documentados no relatório do projeto.",
                 corpo,
             ),
             Paragraph("Três descobertas principais", secao),
             Paragraph(
-                "<b>1.</b> As avaliações se concentram acima do ponto médio: a nota média "
-                "é 3,5016 e a mediana é 3,5 em uma escala de 0,5 a 5.",
+                "<b>1.</b> Considerando o primeiro gênero listado, Ação e Comédia somam "
+                "55,39% das avaliações: 30.635 para Ação e 25.217 para Comédia.",
                 corpo,
             ),
             Paragraph(
-                "<b>2.</b> Ação possui o maior volume de avaliações quando o primeiro gênero "
-                "é adotado como gênero principal: são 30.635 avaliações, seguida por "
-                "Comédia, com 25.217.",
+                "<b>2.</b> 81,09% das notas estão entre 3 e 5 estrelas. A média é "
+                "3,5016 e a mediana é 3,5 em uma escala de 0,5 a 5.",
                 corpo,
             ),
             Paragraph(
@@ -247,4 +252,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

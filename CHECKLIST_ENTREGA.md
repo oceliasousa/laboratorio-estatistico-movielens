@@ -34,9 +34,9 @@ Este arquivo separa o que já está implementado do que exige uma ação da auto
 - [ ] Criar um repositório público no GitHub ou GitLab.
 - [x] Registrar núcleo, aplicação e documentação em commits separados.
 - [ ] Substituir o campo do repositório pelo endereço público definitivo.
-- [ ] Adicionar capturas ou GIF da aplicação ao `README.md`.
+- [x] Adicionar capturas ou GIF da aplicação ao `README.md`.
 - [x] Inserir a evidência dos testes aprovados no relatório.
-- [ ] Inserir capturas atuais das telas da aplicação no README e no relatório.
+- [x] Inserir capturas atuais das oito telas no README e no relatório.
 - [ ] Gravar o vídeo de 3 a 5 minutos com demonstração e explicação do núcleo.
 - [ ] Publicar o vídeo como não listado ou liberar o acesso no Drive.
 - [ ] Preencher o link do vídeo no `README.md`, `RELATORIO.md` e PDF final.
@@ -44,6 +44,20 @@ Este arquivo separa o que já está implementado do que exige uma ação da auto
 - [ ] Gerar o PDF definitivo após informar os links externos.
 - [ ] Testar dataset, repositório e vídeo em uma janela anônima.
 - [ ] Confirmar que a autora sabe explicar funções, fórmulas e módulos.
+- [ ] Confirmar o prazo no ambiente da disciplina (o enunciado trouxe `[DATA/HORA]`).
+- [ ] Anexar o PDF definitivo e confirmar o envio no ambiente virtual.
+
+## Revisão da refatoração — 09/09/2026
+
+- [x] Separação de páginas, análises, dados, gráficos e carregamento.
+- [x] Dataset validado por condições reais, com 9.724 filmes avaliados e 9.742 no catálogo.
+- [x] Tabela e histograma compartilham classes; boxplot usa quartis próprios.
+- [x] NaN, infinitos, iteradores e variáveis constantes cobertos por testes.
+- [x] Documentação e três descobertas consistentes com os números da aplicação.
+- [x] Versões diretas fixadas e dependências auxiliares documentadas.
+
+Detalhamento dos resultados em `docs/VALIDACAO.md`. O histórico local existe;
+a avaliação acadêmica de autoria e desenvolvimento real permanece a cargo do professor.
 
 ## Comandos de verificação
 

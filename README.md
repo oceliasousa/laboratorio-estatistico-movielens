@@ -16,7 +16,7 @@ Aplicação Streamlit desenvolvida para a Sistematização de **Matemática e Es
 - Dados crus: 100.836 avaliações, 9.742 filmes, 610 usuários e 3.683 aplicações de tags
 - Licença e descrição originais: [`data/README.txt`](data/README.txt)
 
-Cada observação analisada é uma avaliação. Além das colunas originais, `src/dados.py` deriva `ano_filme`, `ano_avaliacao`, `genero_principal`, `quantidade_generos` e `faixa_avaliacao`. Assim, a base preparada possui pelo menos quatro variáveis numéricas e duas categóricas.
+Cada observação analisada é uma avaliação. A base de avaliações inclui **9.724 filmes distintos**; os **9.742 filmes** se referem ao catálogo original. Além das colunas originais, `src/dados.py` deriva `ano_filme`, `ano_avaliacao`, `genero_principal`, `quantidade_generos` e `faixa_avaliacao`. São 11 colunas preparadas, quatro variáveis numéricas de análise e quatro categóricas. IDs não contam como grandezas. Há 18 avaliações sem ano do filme, removidas somente nas análises que usam essa coluna.
 
 ## Funcionalidades
 
@@ -29,7 +29,7 @@ Cada observação analisada é uma avaliação. Além das colunas originais, `sr
 
 ## Instalação e execução
 
-É recomendado Python 3.10 ou superior.
+Use Python 3.9 a 3.12 com as versões fixadas em `requirements.txt`. A validação local desta refatoração usou Python 3.9. Python 3.13 ou posterior não foi validado com essas dependências.
 
 ```bash
 cd sistematizacao
@@ -47,17 +47,24 @@ O navegador abrirá em `http://localhost:8501`.
 pytest
 ```
 
-A tolerância adotada é `rel=1e-10` e `abs=1e-12`. Percentis usam interpolação linear, igual ao padrão do NumPy. Variância/covariância populacional usam divisor `N`; as amostrais, `N-1`.
+A tolerância adotada é `rel=1e-10` e `abs=1e-12`. Percentis usam interpolação linear, igual ao padrão do NumPy. Variância/covariância populacional usam divisor `N`; as amostrais, `N-1`. Veja o resultado e o escopo em [Validação](docs/VALIDACAO.md).
 
 ## Estrutura
 
 ```text
 sistematizacao/
-├── app.py                    # interface Streamlit
+├── app.py                    # ponto de entrada e tratamento de erros
 ├── src/
 │   ├── dados.py              # preparação reprodutível
-│   └── minhastats.py         # núcleo matemático próprio
-├── tests/test_minhastats.py  # validação NumPy/SciPy
+│   ├── minhastats.py         # núcleo matemático próprio
+│   ├── analises.py           # frequências, IQR, simulação, ajuste e regressão
+│   ├── config.py             # caminhos e configuração compartilhada
+│   ├── rotas.py              # registro das oito páginas
+│   ├── paginas/              # uma tela por arquivo
+│   └── ui/                   # layout, gráficos, formatação e carregamento
+├── tests/                    # núcleo, análises, dados e integração das telas
+├── styles.css               # estilos e regras responsivas
+├── docs/images/             # capturas reais da aplicação
 ├── data/                     # arquivos crus MovieLens
 ├── RELATORIO.md
 └── requirements.txt
@@ -67,10 +74,21 @@ sistematizacao/
 
 ### Evidência dos testes automatizados
 
-![Doze testes automatizados aprovados](docs/images/testes-pytest.png)
+![Resultado dos testes automatizados](docs/images/testes-pytest.png)
 
-Ainda é necessário salvar ao menos uma captura atual da aplicação em
-`docs/images/tela-aplicacao.png` para completar a evidência visual exigida.
+Capturas feitas após a refatoração em 09/09/2026:
+
+![Tela inicial](docs/images/inicio.png)
+![Estatística descritiva](docs/images/descritiva.png)
+![Correlação e regressão](docs/images/regressao.png)
+
+As oito telas estão documentadas no [relatório](RELATORIO.md).
+
+## Onde editar
+
+Textos de cada tela: `src/paginas/`. Cabeçalho, navegação e rodapé: `src/ui/layout.py`.
+Mensagens de carregamento: `src/ui/carregamento.py`. Cores e dimensões: `styles.css`.
+Fórmulas: `src/minhastats.py`; análises reutilizáveis: `src/analises.py`.
 
 ## Vídeo
 
@@ -82,6 +100,12 @@ Uma prévia é gerada sem os links externos:
 
 ```bash
 python scripts/gerar_pdf_entrega.py
+```
+
+Antes de gerar o PDF ou a imagem dos testes, instale as dependências auxiliares:
+
+```bash
+python -m pip install -r requirements-entrega.txt
 ```
 
 Depois de publicar o repositório e o vídeo, gere o arquivo definitivo:
@@ -98,3 +122,12 @@ O arquivo final será salvo em
 ## Aviso analítico
 
 Os resultados descrevem apenas esta amostra do MovieLens. Associação estatística não demonstra causalidade.
+Os ajustes contínuos são aproximações de variáveis discretizadas. O primeiro gênero listado
+é uma convenção, não uma classificação principal oficial. A licença original acompanha `data/README.txt`.
+
+## O que falta para entregar
+
+Publicar um repositório público, gravar/publicar o vídeo de 3 a 5 minutos,
+informar os dois links e gerar o PDF definitivo. Depois, verificar o acesso aos links
+em janela anônima e anexar o PDF no ambiente da disciplina dentro do prazo.
+Veja [CHECKLIST_ENTREGA.md](CHECKLIST_ENTREGA.md). Nenhuma publicação foi realizada automaticamente.
