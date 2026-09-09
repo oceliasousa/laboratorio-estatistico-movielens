@@ -112,6 +112,22 @@ def iniciar_carregamento(pagina):
         "sobre": "Carregando a documentação",
     }
     titulo = titulos.get(pagina, "Carregando página")
+    # O HTML chega antes do conteúdo. O iframe só coordena a conclusão;
+    # sua inicialização assíncrona não deve decidir quando mostrar a máscara.
+    st.markdown(
+        f"""
+        <div id="labestat-page-loader" role="status" aria-live="polite">
+          <div class="loader-panel">
+            <div class="loader-symbol" aria-hidden="true">∑</div>
+            <div class="loader-copy">
+              <strong>{titulo}</strong><span>LabEstat</span>
+            </div>
+            <div class="loader-track" aria-hidden="true"><i></i></div>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     with st.container(key="page_loader_start"):
         components.html(
             f"""
@@ -127,23 +143,8 @@ def iniciar_carregamento(pagina):
               appWindow.__labestatLoaderRoute = route;
               if (!firstRender && !routeChanged) return;
 
-              document.getElementById("labestat-page-loader")?.remove();
-              const loader = document.createElement("div");
-              loader.id = "labestat-page-loader";
-              loader.setAttribute("role", "status");
-              loader.setAttribute("aria-live", "polite");
-              loader.innerHTML = `
-                <div class="loader-panel">
-                  <div class="loader-symbol">∑</div>
-                  <div class="loader-copy">
-                    <strong>{titulo}</strong>
-                    <span>LabEstat</span>
-                  </div>
-                  <div class="loader-track"><i></i></div>
-                </div>`;
-              document.body.appendChild(loader);
+              document.documentElement.removeAttribute("data-labestat-ready");
               appWindow.__labestatLoaderStarted = appWindow.performance.now();
-              appWindow.requestAnimationFrame(() => loader.classList.add("is-visible"));
             }})();
             </script>
             """,
@@ -170,8 +171,7 @@ def finalizar_carregamento():
                   - (appWindow.__labestatLoaderStarted || 0);
                 const remaining = Math.max(0, 520 - elapsed);
                 appWindow.setTimeout(() => {
-                  loader.classList.add("is-ready");
-                  appWindow.setTimeout(() => loader.remove(), 260);
+                  document.documentElement.setAttribute("data-labestat-ready", "true");
                 }, remaining);
               };
 
