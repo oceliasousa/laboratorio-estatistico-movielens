@@ -57,9 +57,6 @@ def controlar_rolagem(pagina):
               const storageKey = "labestat-rota-atual";
               appWindow.history.scrollRestoration = "manual";
 
-              if (appWindow.sessionStorage.getItem(storageKey) === route) return;
-              appWindow.sessionStorage.setItem(storageKey, route);
-
               const resetScroll = () => {{
                 const document = appWindow.document;
                 const containers = [
@@ -77,16 +74,23 @@ def controlar_rolagem(pagina):
                 }});
               }};
 
-              resetScroll();
-              let frame = 0;
-              const stabilizeAtTop = () => {{
+              appWindow.__labestatResetScroll = resetScroll;
+
+              if (!appWindow.__labestatScrollNavigationBound) {{
+                appWindow.document.addEventListener("pointerdown", (event) => {{
+                  const link = event.target.closest('a[href*="?page="]');
+                  if (link) appWindow.__labestatResetScroll();
+                }}, true);
+                appWindow.addEventListener("beforeunload", () => {{
+                  appWindow.__labestatResetScroll();
+                }});
+                appWindow.__labestatScrollNavigationBound = true;
+              }}
+
+              if (appWindow.sessionStorage.getItem(storageKey) !== route) {{
+                appWindow.sessionStorage.setItem(storageKey, route);
                 resetScroll();
-                frame += 1;
-                if (frame < 24) appWindow.requestAnimationFrame(stabilizeAtTop);
-              }};
-              appWindow.requestAnimationFrame(stabilizeAtTop);
-              appWindow.setTimeout(resetScroll, 350);
-              appWindow.setTimeout(resetScroll, 800);
+              }}
             }})();
             </script>
             """,
