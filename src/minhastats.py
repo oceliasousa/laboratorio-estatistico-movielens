@@ -1,12 +1,13 @@
 """Núcleo estatístico educacional implementado sem funções estatísticas prontas.
 
-As funções aceitam qualquer iterável numérico finito. Percentis usam interpolação
+As medidas numéricas aceitam qualquer iterável numérico finito. Percentis usam interpolação
 linear, equivalente ao método ``linear`` padrão do NumPy. Variâncias adotam
-denominador N (população) ou N-1 (amostra).
+denominador N (população) ou N-1 (amostra). Contagens e modas categóricas
+aceitam categorias hashable; None e NaN formam uma categoria ausente única.
 """
 
-from math import fsum, isfinite, sqrt
-from numbers import Real
+from math import fsum, isfinite, isnan, sqrt
+from numbers import Integral, Real
 
 
 def _valores(dados):
@@ -41,6 +42,66 @@ def moda(dados):
         contagens[valor] = contagens.get(valor, 0) + 1
     maior = max(contagens.values())
     return sorted(valor for valor, quantidade in contagens.items() if quantidade == maior)
+
+
+def frequencias_categoricas(dados):
+    """Contagem própria, decrescente; empates preservam a primeira ocorrência.
+
+    Ausentes (None/NaN) são contados sob a chave None e entram no total.
+    Marcadores de bibliotecas, como pd.NA/NaT, devem ser normalizados para
+    None na preparação. Rótulos literais como "Ausente" não são ausentes.
+    Não utiliza Counter, value_counts ou funções estatísticas prontas.
+    """
+    contagens = {}
+    for categoria in dados:
+        if isinstance(categoria, Real):
+            if isnan(categoria):
+                categoria = None
+            elif not isfinite(categoria):
+                raise ValueError("Categorias numéricas não podem ser infinitas.")
+        try:
+            contagens[categoria] = contagens.get(categoria, 0) + 1
+        except TypeError as erro:
+            raise TypeError("Cada categoria deve ser hashable (ex.: texto ou número).") from erro
+    if not contagens:
+        raise ValueError("A amostra não pode ser vazia.")
+    return dict(sorted(contagens.items(), key=lambda item: -item[1]))
+
+
+def moda_categorica(dados):
+    """Todas as categorias de frequência máxima, na ordem de ocorrência.
+
+    Segue a convenção de multimode: se todas empatam, retorna todas.
+    """
+    contagens = frequencias_categoricas(dados)
+    maior = max(contagens.values())
+    return [categoria for categoria, quantidade in contagens.items() if quantidade == maior]
+
+
+def _contagens(valores):
+    contagens = list(valores)
+    if not contagens or any(not isinstance(n, Integral) or n < 0 for n in contagens):
+        raise ValueError("Informe contagens inteiras não negativas em uma lista não vazia.")
+    return contagens
+
+
+def frequencias_relativas(contagens):
+    """Proporções n_i / N, entre 0 e 1, na mesma ordem das contagens."""
+    contagens = _contagens(contagens)
+    total = sum(contagens)
+    if total == 0:
+        raise ValueError("A frequência relativa exige total positivo.")
+    return [quantidade / total for quantidade in contagens]
+
+
+def frequencias_acumuladas(contagens):
+    """Somas parciais próprias; úteis para classes numéricas ordenadas."""
+    acumuladas = []
+    total = 0
+    for quantidade in _contagens(contagens):
+        total += quantidade
+        acumuladas.append(total)
+    return acumuladas
 
 
 def amplitude(dados):

@@ -62,6 +62,10 @@ def pagina_sobre(dados=None):
                   <code>media(dados)</code>
                   <code>mediana(dados)</code>
                   <code>moda(dados)</code>
+                  <code>moda_categorica(dados)</code>
+                  <code>frequencias_categoricas(dados)</code>
+                  <code>frequencias_relativas(contagens)</code>
+                  <code>frequencias_acumuladas(contagens)</code>
                   <code>amplitude(dados)</code>
                   <code>variancia_populacional(dados)</code>
                   <code>variancia_amostral(dados)</code>
@@ -99,6 +103,7 @@ def pagina_sobre(dados=None):
             st.markdown("### Validação")
             st.markdown(
                 "- Execute `pytest -q` para validar o núcleo estatístico.\n"
+                "- Moda categórica: todos os empates são preservados. Ausentes entram no total como categoria separada.\n"
                 "- Consulte `docs/VALIDACAO.md` para o resultado registrado da validação."
             )
             from src.config import RAIZ

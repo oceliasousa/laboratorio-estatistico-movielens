@@ -7,7 +7,7 @@ import streamlit as st
 from src import minhastats as ms
 from src.dados import CATEGORICAS, NUMERICAS_ANALISE
 from src.analises import valores_numericos, interpretar_assimetria
-from src.analises import tabela_frequencias, resumo_iqr
+from src.analises import tabela_frequencias, tabela_categorica, resumo_iqr
 from src.ui.formatacao import formatar
 from src.ui.layout import cabecalho
 from src.ui.graficos import estilizar, exibir_grafico
@@ -37,9 +37,7 @@ def pagina_descritiva(dados):
         c4.info(f"{len(dados):,} registros disponíveis")
 
     if tipo == "Categórica":
-        contagem = dados[coluna].fillna("Ausente").value_counts()
-        tabela = pd.DataFrame({"Categoria": contagem.index, "Frequência": contagem.values})
-        tabela["Frequência relativa (%)"] = tabela["Frequência"] / len(dados) * 100
+        tabela = tabela_categorica(dados[coluna])
         esquerda, direita = st.columns([1, 1.55])
         with esquerda:
             with st.container(border=True, key="equal_card_categoria_tabela"):
@@ -56,10 +54,19 @@ def pagina_descritiva(dados):
                     color_discrete_sequence=["#29c9e6"],
                 )
                 exibir_grafico(estilizar(fig, 440))
-        st.success(
-            f"A categoria modal é {contagem.index[0]}, com {contagem.iloc[0]:,} ocorrências."
-        )
-        st.caption("A tabela inclui todas as categorias; o gráfico mostra até 20.")
+        modais = tabela.loc[tabela["Modal"]]
+        maior = int(modais["Frequência"].iloc[0])
+        if len(modais) == 1:
+            st.success(f"Categoria modal: {modais['Categoria'].iloc[0]} — {maior:,} ocorrências.")
+        elif len(modais) == len(tabela):
+            st.info(f"Todas as {len(modais)} categorias têm a mesma frequência ({maior:,}). "
+                    "Não há uma categoria modal única; todas estão marcadas na coluna Modal.")
+        else:
+            st.info(f"Há {len(modais)} categorias modais, com {maior:,} ocorrências cada. "
+                    "Todas estão marcadas na coluna Modal da tabela.")
+        st.caption("Contagens, proporções e modas calculadas pelo núcleo próprio. "
+                   "A tabela inclui todas as categorias; o gráfico mostra até 20. "
+                   "Valores ausentes entram no total como categoria separada.")
         return
 
     valores = valores_numericos(dados, coluna)
@@ -128,12 +135,12 @@ def pagina_descritiva(dados):
                     ],
                     "Frequência": frequencias,
                     "Relativa": [
-                        f"{valor / len(valores) * 100:.1f}%"
-                        for valor in frequencias
+                        f"{proporcao * 100:.1f}%"
+                        for proporcao in ms.frequencias_relativas(frequencias)
                     ],
                 }
             )
-            tabela["Acumulada"] = tabela["Frequência"].cumsum()
+            tabela["Acumulada"] = ms.frequencias_acumuladas(frequencias)
             st.dataframe(tabela, hide_index=True, width="stretch", height=460)
     with centro:
         with st.container(border=True, key="equal_card_descritiva_distribuicao"):

@@ -2,9 +2,11 @@
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 from src import minhastats as ms
 from src.dados import CATEGORICAS, NUMERICAS
+from src.analises import tabela_categorica, tabela_frequencias
 from src.ui.graficos import estilizar, exibir_grafico
 
 
@@ -55,44 +57,43 @@ def pagina_inicio(dados):
         unsafe_allow_html=True,
     )
     p1, p2, p3 = st.columns(3)
-    generos = dados["genero_principal"].value_counts().head(5)
+    generos = tabela_categorica(dados["genero_principal"]).head(5)
     with p1:
         with st.container(border=True, key="equal_card_home_generos"):
             st.markdown("#### Distribuição entre os 5 gêneros mais avaliados")
             fig = px.pie(
-                values=generos.values,
-                names=generos.index,
+                values=generos["Frequência"],
+                names=generos["Categoria"],
                 hole=0.58,
                 color_discrete_sequence=["#4f6dff", "#28c7dd", "#19d3ae", "#ff865e", "#d54bd1"],
             )
             fig.update_traces(
-                textinfo="none", marker=dict(line=dict(color="#081526", width=2))
+                textinfo="none", marker=dict(line=dict(color="#081526", width=2)),
+                customdata=ms.frequencias_relativas(generos["Frequência"]),
+                hovertemplate="%{label}<br>%{value} avaliações<br>%{customdata:.1%} dos cinco gêneros<extra></extra>",
             )
             exibir_grafico(estilizar(fig, 270))
     with p2:
         with st.container(border=True, key="equal_card_home_avaliacoes"):
             st.markdown("#### Distribuição das avaliações")
-            fig = px.histogram(
-                dados,
-                x="rating",
-                nbins=10,
-                color_discrete_sequence=["#7c3aed"],
-                labels={"rating": "Avaliação"},
-            )
+            classes = tabela_frequencias(dados["rating"], 10)
+            fig = go.Figure(go.Bar(x=classes.centros, y=classes.contagens,
+                                  width=classes.larguras, marker_color="#7c3aed"))
+            fig.update_layout(xaxis_title="Avaliação", yaxis_title="Frequência", bargap=0.03)
             exibir_grafico(estilizar(fig, 270))
     with p3:
         with st.container(border=True, key="equal_card_home_medias"):
             st.markdown("#### Avaliação média por gênero")
             medias = pd.DataFrame(
                 {
-                    "Gênero": list(generos.index),
+                    "Gênero": generos["Categoria"].tolist(),
                     "Média": [
                         ms.media(
                             dados.loc[
                                 dados["genero_principal"] == genero, "rating"
                             ].tolist()
                         )
-                        for genero in generos.index
+                        for genero in generos["Categoria"]
                     ],
                 }
             ).sort_values("Média")

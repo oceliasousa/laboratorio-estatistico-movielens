@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from scipy import stats
-from src.analises import tabela_frequencias, resumo_iqr, ajustar_distribuicao, simular
+from src.analises import tabela_frequencias, resumo_iqr, ajustar_distribuicao, simular, descobertas_calculadas
 from src.dados import carregar_dados, preparar_dados, validar_estrutura
 from src import minhastats as ms
 
@@ -64,3 +64,22 @@ def test_merge_recusa_perda_de_avaliacoes():
     with pytest.raises(ValueError, match='ausentes no catálogo'):
         preparar_dados(dados[['userId', 'movieId', 'rating', 'timestamp']],
                        dados[['movieId', 'title', 'genres']].iloc[:1])
+
+
+def test_descobertas_com_contagens_proprias():
+    dados = carregar_dados()
+    contagens, percentual, notas_altas, _, _ = descobertas_calculadas(dados)
+    referencia = dados['genero_principal'].value_counts()
+    assert contagens.to_dict() == referencia.to_dict()
+    assert percentual == pytest.approx((30635 + 25217) / 100836 * 100, rel=1e-10, abs=1e-12)
+    assert notas_altas == pytest.approx(dados.rating.between(3, 5).mean() * 100, rel=1e-10, abs=1e-12)
+
+
+def test_percentual_nomeado_nao_soma_outros_generos():
+    import pandas as pd
+
+    dados = pd.DataFrame({'genero_principal': ['Drama', 'Drama', 'Drama', 'Comedy', 'Action'],
+                          'rating': [2, 4, 5, 1, 3], 'ano_filme': [1990, 1991, 2000, 2001, 2002]})
+    _, percentual, notas_altas, _, _ = descobertas_calculadas(dados)
+    assert percentual == pytest.approx(40)
+    assert notas_altas == pytest.approx(60)

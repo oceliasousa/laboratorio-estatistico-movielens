@@ -31,7 +31,7 @@ O arquivo `src/minhastats.py` converte entradas em listas e executa explicitamen
 
 Na refatoração, `app.py` passou a cuidar somente da configuração, carga, escolha da rota e tratamento de erros. `src/paginas/` reúne as oito telas; `src/ui/` centraliza layout, formatação, gráficos e carregamento; `src/analises.py` oferece funções testáveis para frequências, IQR, simulações, densidades e resultados da regressão. As funções de análise independem do Streamlit.
 
-Entradas vazias, não numéricas, NaN e infinitos são rejeitados pelo núcleo. Iteradores são materializados uma vez para evitar consumo indevido. A média usa `math.fsum` para a soma em ponto flutuante. CV com média zero, Pearson com variável constante e R² com Y constante são recusados com mensagens explícitas.
+Nas medidas numéricas, entradas vazias, não numéricas, NaN e infinitos são rejeitados pelo núcleo. Iteradores são materializados uma vez para evitar consumo indevido. A média usa `math.fsum` para a soma em ponto flutuante. CV com média zero, Pearson com variável constante e R² com Y constante são recusados com mensagens explícitas. As funções categóricas possuem tratamento próprio de ausentes, descrito abaixo.
 
 Para observações \(x_1,\ldots,x_n\):
 
@@ -40,6 +40,27 @@ Para observações \(x_1,\ldots,x_n\):
 $$\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i$$
 
 A mediana é o elemento central dos dados ordenados; para tamanho par, é a média dos dois centrais. A moda reúne os valores que atingem a maior frequência.
+
+### Frequências e moda categórica
+
+Para uma categoria \(c\), o núcleo percorre as observações e incrementa um dicionário:
+
+$$n_c=\sum_{i=1}^{N}\mathbf{1}(x_i=c),\qquad f_c=\frac{n_c}{N},\qquad
+M=\{c:n_c=\max_j n_j\}.$$
+
+`frequencias_categoricas` calcula as contagens; `moda_categorica` retorna todas as categorias
+de frequência máxima. A ordenação é decrescente por frequência e, em empates, preserva a ordem
+da primeira ocorrência. Se todas as categorias empatam, todas são modais, conforme a convenção
+de `statistics.multimode`; a tela informa que não há moda única.
+
+`None` e `NaN` são agrupados como ausentes. Na preparação, Pandas apenas identifica os marcadores
+`pd.NA`/`NaT` e os converte para `None`; não calcula contagens nem modas. Os ausentes são incluídos
+no denominador \(N\) e recebem um rótulo visual distinto de qualquer categoria literal existente.
+A tabela marca todas as modas na coluna `Modal`, mesmo quando o gráfico limita a exibição a 20 categorias.
+
+`frequencias_relativas` calcula \(n_i/N\), e `frequencias_acumuladas` calcula
+\(F_k=\sum_{i=1}^{k}n_i\) para as classes numéricas ordenadas. Não se atribui frequência
+acumulada a gêneros nominais, pois não há ordem natural entre eles.
 
 ### Dispersão
 
@@ -73,7 +94,7 @@ $$R^2=1-\frac{\sum(y_i-\hat{y}_i)^2}{\sum(y_i-\bar{y})^2}$$
 
 ## 4. Validação
 
-Os testes em `tests/test_minhastats.py` confrontam todas as funções com NumPy ou SciPy. Foram definidos `rel=1e-10` e `abs=1e-12` para acomodar pequenas diferenças de ponto flutuante. Casos inválidos (amostra vazia, percentil fora da faixa, variância com uma observação e variável constante) também são testados.
+A suíte em `tests/` confronta as medidas com NumPy, SciPy, Pandas ou `statistics`. Foram definidos `rel=1e-10` e `abs=1e-12` para acomodar pequenas diferenças de ponto flutuante. Contagens e modas são comparadas exatamente. Casos inválidos (amostra vazia, percentil fora da faixa, variância com uma observação e variável constante) também são testados.
 
 Comando de validação:
 
@@ -81,12 +102,20 @@ Comando de validação:
 pytest
 ```
 
-Resultado da refatoração em 09/09/2026: **81 testes aprovados**. O detalhamento e o ambiente estão em [docs/VALIDACAO.md](docs/VALIDACAO.md). A suíte inclui testes do núcleo, das análises, da preparação dos dados, das oito rotas e de estados interativos.
+Resultado da revisão em 13/09/2026: **147 testes aprovados**. O detalhamento e o ambiente estão em [docs/VALIDACAO.md](docs/VALIDACAO.md). A suíte inclui testes do núcleo, das análises, da preparação dos dados, das oito rotas e de estados interativos.
+
+A revisão corrigiu uma lacuna da versão anterior: as frequências categóricas e a categoria modal
+ainda eram derivadas de `Pandas.value_counts()`. Agora as contagens, proporções e modas vêm de
+funções próprias. Foram acrescentados 56 testes categóricos e 10 testes de análise/interface,
+incluindo ausentes, empates e verificações que falham se as telas voltarem a usar `value_counts`
+ou histogramas com agregação automática. Os números das três descobertas permaneceram iguais.
 
 | Grupo validado | Referência |
 |---|---|
 | Média, mediana, amplitude, variâncias e desvios | NumPy |
 | Moda, incluindo empates | SciPy e `statistics.multimode` |
+| Frequências e moda categóricas, incluindo ausentes e empates | Pandas e `statistics.multimode` |
+| Frequências relativas e acumuladas | NumPy |
 | Percentis e quartis | NumPy |
 | Coeficiente de variação | SciPy |
 | Covariância e correlação de Pearson | NumPy e SciPy |
@@ -109,7 +138,7 @@ Documenta todas as funções estatísticas exigidas, as bibliotecas usadas como 
 
 ### Módulo 2 — Descritiva
 
-O usuário seleciona uma variável. Para numéricas, vê as medidas próprias, frequências em classes, histograma, boxplot, assimetria de Pearson e outliers por IQR. Para categóricas, vê frequências absoluta/relativa e gráfico de barras.
+O usuário seleciona uma variável. Para numéricas, vê as medidas próprias, frequências em classes, histograma, boxplot, assimetria de Pearson e outliers por IQR. Para categóricas, vê frequências absoluta/relativa, todas as categorias modais e gráfico de barras, calculados pelas funções próprias.
 
 Tabela e histograma compartilham a mesma contagem própria e as mesmas bordas: classes fechadas à esquerda e abertas à direita, exceto a última, fechada dos dois lados. O boxplot recebe Q1, mediana, Q3 e bigodes já calculados pelo núcleo. A tabela categórica inclui todas as categorias; somente o gráfico limita a visualização às 20 mais frequentes. Para `rating`, Q1 = 3, Q3 = 4 e IQR = 1: há **4.181 observações** abaixo do limite inferior 1,5.
 
@@ -182,7 +211,7 @@ Depois que os links forem informados, o script `scripts/gerar_pdf_entrega.py` cr
 
 ## 9. Capturas atuais dos módulos
 
-As capturas abaixo foram feitas no navegador em 09/09/2026, após a refatoração.
+As capturas abaixo foram atualizadas no navegador em 13/09/2026, após a revisão dos cálculos.
 
 ### Início
 
@@ -199,6 +228,10 @@ As capturas abaixo foram feitas no navegador em 09/09/2026, após a refatoraçã
 ### Descritiva — módulo 2
 
 ![Descritiva](docs/images/descritiva.png)
+
+Estado categórico, com frequências próprias e identificação de todas as categorias modais:
+
+![Frequências e moda categórica](docs/images/descritiva-categorica.png)
 
 ### Simulação — módulo 3
 

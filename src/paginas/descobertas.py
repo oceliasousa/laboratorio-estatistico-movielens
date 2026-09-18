@@ -1,9 +1,10 @@
 """Descobertas do laboratório estatístico."""
 
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 from src import minhastats as ms
-from src.analises import descobertas_calculadas
+from src.analises import descobertas_calculadas, tabela_frequencias
 from src.ui.layout import cabecalho
 from src.ui.graficos import estilizar, exibir_grafico
 
@@ -41,7 +42,7 @@ def pagina_descobertas(dados):
         evidencias.markdown(
             f"### Evidências\n**Total:** {len(dados):,}\n\n"
             f"**Ação + Comédia:** {percentual:.1f}%\n\n"
-            f"**Gêneros:** {dados['genero_principal'].nunique()}"
+            f"**Gêneros:** {len(generos)}"
         )
 
     with st.container(border=True):
@@ -55,12 +56,10 @@ def pagina_descobertas(dados):
             f"{notas_altas:.1f}% das avaliações estão na faixa de 3 a 5 estrelas, "
             "indicando predominância de avaliações médias e altas."
         )
-        fig = px.histogram(
-            dados,
-            x="rating",
-            nbins=10,
-            color_discrete_sequence=["#8a42f4"],
-        )
+        classes = tabela_frequencias(dados["rating"], 10)
+        fig = go.Figure(go.Bar(x=classes.centros, y=classes.contagens,
+                              width=classes.larguras, marker_color="#8a42f4"))
+        fig.update_layout(xaxis_title="Avaliação", yaxis_title="Frequência", bargap=0.03)
         exibir_grafico(estilizar(fig, 220), container=grafico)
         evidencias.markdown(
             f"### Evidências\n**Média:** {ms.media(dados['rating'].tolist()):.2f}"

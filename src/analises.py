@@ -6,6 +6,27 @@ from bisect import bisect_right
 from math import exp, pi, sqrt
 
 import numpy as np
+import pandas as pd
+
+
+def tabela_categorica(valores):
+    """Prepara ausentes; contagem, proporções e modas vêm do núcleo próprio.
+
+    O DataFrame só organiza os resultados para exibição. O marcador visual
+    dos ausentes não colide com categorias literais já presentes.
+    """
+    categorias = [None if pd.isna(valor) else valor for valor in valores]
+    contagens = ms.frequencias_categoricas(categorias)
+    modas = set(ms.moda_categorica(categorias))
+    rotulo_ausente = "Ausente (valor faltante)"
+    while rotulo_ausente in contagens:
+        rotulo_ausente += " *"
+    return pd.DataFrame({
+        "Categoria": [rotulo_ausente if c is None else c for c in contagens],
+        "Frequência": list(contagens.values()),
+        "Frequência relativa (%)": [100 * p for p in ms.frequencias_relativas(contagens.values())],
+        "Modal": [c in modas for c in contagens],
+    })
 
 
 @dataclass(frozen=True)
@@ -129,9 +150,12 @@ def interpretar_assimetria(valores):
 
 
 def descobertas_calculadas(dados):
-    contagem_generos = dados["genero_principal"].value_counts()
-    percentual_generos = contagem_generos.head(2).sum() / len(dados) * 100
-    notas_altas = dados["rating"].between(3, 5).sum() / len(dados) * 100
+    tabela = tabela_categorica(dados["genero_principal"])
+    contagem_generos = pd.Series(tabela["Frequência"].tolist(), index=tabela["Categoria"])
+    # Os títulos desta descoberta se referem explicitamente a Ação e Comédia.
+    percentual_generos = sum(contagem_generos.get(g, 0) for g in ("Action", "Comedy")) / len(dados) * 100
+    faixas = ms.frequencias_categoricas(3 <= nota <= 5 for nota in dados["rating"])
+    notas_altas = faixas.get(True, 0) / len(dados) * 100
     pares = dados[["ano_filme", "rating"]].dropna()
     relacao = ms.correlacao_pearson(
         pares["ano_filme"].astype(float).tolist(),

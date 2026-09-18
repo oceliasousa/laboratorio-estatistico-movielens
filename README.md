@@ -21,11 +21,12 @@ Cada observação analisada é uma avaliação. A base de avaliações inclui **
 ## Funcionalidades
 
 - núcleo próprio com média, mediana, moda, amplitude, variâncias, desvios, percentis, quartis, CV, covariância, Pearson e regressão por mínimos quadrados;
+- frequências absolutas, relativas e acumuladas próprias; moda categórica com todos os empates e tratamento explícito de ausentes;
 - tabela de frequência, histograma, boxplot, barras, IQR e interpretação automática;
 - Monte Carlo para Lei dos Grandes Números e Teorema Central do Limite;
 - ajuste visual das distribuições Normal, Exponencial e Uniforme;
 - correlação, reta, equação, R² e predição interativa;
-- testes automatizados comparados com NumPy e SciPy.
+- testes automatizados comparados com NumPy, SciPy, Pandas e `statistics` (bibliotecas de referência, não usadas no cálculo das medidas exibidas).
 
 ## Instalação e execução
 
@@ -48,6 +49,11 @@ pytest
 ```
 
 A tolerância adotada é `rel=1e-10` e `abs=1e-12`. Percentis usam interpolação linear, igual ao padrão do NumPy. Variância/covariância populacional usam divisor `N`; as amostrais, `N-1`. Veja o resultado e o escopo em [Validação](docs/VALIDACAO.md).
+
+Contagens e conjuntos de modas são comparados exatamente; as proporções usam a tolerância acima.
+Nas categóricas, ausentes entram no total como categoria separada, sem se misturar com o texto
+literal `Ausente`. Empates preservam todas as modas, identificadas na coluna `Modal`.
+Os histogramas recebem frequências calculadas em Python, inclusive na tela inicial e no TCL.
 
 ## Estrutura
 
@@ -76,10 +82,11 @@ sistematizacao/
 
 ![Resultado dos testes automatizados](docs/images/testes-pytest.png)
 
-Capturas feitas após a refatoração em 09/09/2026:
+Capturas atualizadas após a revisão dos cálculos em 13/09/2026:
 
 ![Tela inicial](docs/images/inicio.png)
 ![Estatística descritiva](docs/images/descritiva.png)
+![Frequências e moda categórica próprias](docs/images/descritiva-categorica.png)
 ![Correlação e regressão](docs/images/regressao.png)
 
 As oito telas estão documentadas no [relatório](RELATORIO.md).

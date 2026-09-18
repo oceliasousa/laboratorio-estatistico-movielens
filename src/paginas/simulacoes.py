@@ -1,13 +1,12 @@
 """Simulacoes do laboratório estatístico."""
 
 import numpy as np
-import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 from src import minhastats as ms
 from src.dados import NUMERICAS_ANALISE
 from src.analises import valores_numericos
-from src.analises import simular, densidade_normal
+from src.analises import simular, densidade_normal, tabela_frequencias
 from src.ui.formatacao import formatar
 from src.ui.layout import cabecalho
 from src.ui.graficos import estilizar, exibir_grafico
@@ -65,13 +64,11 @@ def pagina_simulacoes(dados):
             st.caption("Médias amostrais com referência Normal de média μ e desvio σ/√n.")
             mu = ms.media(populacao)
             sigma = ms.desvio_padrao_populacional(populacao) / tamanho ** 0.5
-            fig = px.histogram(
-                x=medias,
-                nbins=40,
-                histnorm="probability density",
-                color_discrete_sequence=["#7656ff"],
-                labels={"x": "Média amostral"},
-            )
+            classes = tabela_frequencias(medias, 40)
+            fig = go.Figure(go.Bar(x=classes.centros, y=classes.densidades,
+                                  width=classes.larguras, marker_color="#7656ff",
+                                  name="Médias amostrais"))
+            fig.update_layout(xaxis_title="Média amostral", yaxis_title="Densidade", bargap=0.03)
             eixo = np.linspace(min(medias), max(medias), 300)
             fig.add_scatter(
                 x=eixo,

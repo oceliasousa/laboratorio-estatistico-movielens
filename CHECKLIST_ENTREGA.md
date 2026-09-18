@@ -8,6 +8,7 @@ Este arquivo separa o que já está implementado do que exige uma ação da auto
 - [x] Pelo menos quatro variáveis numéricas e duas categóricas.
 - [x] Arquivos crus preservados em `data/` e preparação reproduzível em `src/dados.py`.
 - [x] Média, mediana, moda e amplitude próprias.
+- [x] Moda categórica e frequências próprias, com empates e ausentes validados.
 - [x] Variância e desvio padrão amostral e populacional próprios.
 - [x] Percentis, quartis e coeficiente de variação próprios.
 - [x] Covariância e correlação de Pearson próprias.
@@ -52,6 +53,7 @@ Este arquivo separa o que já está implementado do que exige uma ação da auto
 - [x] Separação de páginas, análises, dados, gráficos e carregamento.
 - [x] Dataset validado por condições reais, com 9.724 filmes avaliados e 9.742 no catálogo.
 - [x] Tabela e histograma compartilham classes; boxplot usa quartis próprios.
+- [x] Histogramas do início, descobertas e TCL recebem contagens/densidades próprias, sem agregação automática do Plotly.
 - [x] NaN, infinitos, iteradores e variáveis constantes cobertos por testes.
 - [x] Documentação e três descobertas consistentes com os números da aplicação.
 - [x] Versões diretas fixadas e dependências auxiliares documentadas.
