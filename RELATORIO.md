@@ -201,13 +201,13 @@ O resultado dos testes está registrado na Seção 4 e na imagem `docs/images/te
 
 O repositório Git local possui commits separados para o núcleo estatístico e preparação dos dados, a aplicação Streamlit, a documentação e a validação final. Essa separação facilita a identificação da evolução técnica do projeto.
 
-Materiais externos que ainda dependem de publicação:
+Situação dos materiais de entrega:
 
 - **Vídeo:** aguardando gravação e publicação.
-- **Repositório público:** aguardando criação e publicação.
+- **Repositório público:** [oceliasousa/laboratorio-estatistico-movielens](https://github.com/oceliasousa/laboratorio-estatistico-movielens).
 - **Capturas da aplicação:** registradas após a refatoração em `docs/images/`.
 
-Depois que os links forem informados, o script `scripts/gerar_pdf_entrega.py` cria o arquivo definitivo `SISTEMATIZACAO_MEC_OceliaAssisDeSousa.pdf`. A prévia já foi gerada e revisada visualmente.
+Depois que o vídeo for publicado, o script `scripts/gerar_pdf_entrega.py` recebe os links do repositório e do vídeo e cria o arquivo definitivo `SISTEMATIZACAO_MEC_OceliaAssisDeSousa.pdf`. A prévia já foi gerada e revisada visualmente.
 
 ## 9. Capturas atuais dos módulos
 
@@ -251,4 +251,4 @@ Estado categórico, com frequências próprias e identificação de todas as cat
 
 ## 10. Situação da entrega
 
-Os módulos técnicos, testes e evidências locais estão implementados. A entrega ainda exige publicação do repositório público, gravação/publicação do vídeo, preenchimento dos links e geração do PDF definitivo. A autora deve verificar os links em janela anônima, confirmar o prazo no ambiente virtual e efetuar o envio. O enunciado fornecido contém apenas o marcador `[DATA/HORA]`, sem prazo preenchido.
+Os módulos técnicos, testes e evidências locais estão implementados, e o repositório público está disponível no GitHub. A entrega ainda exige gravação/publicação do vídeo, preenchimento de seu link e geração do PDF definitivo com ambos os links. A autora deve verificar os links em janela anônima, confirmar o prazo no ambiente virtual e efetuar o envio. O enunciado fornecido contém apenas o marcador `[DATA/HORA]`, sem prazo preenchido.

@@ -9,7 +9,7 @@
 ## Links obrigatórios
 
 - **Dados crus:** https://files.grouplens.org/datasets/movielens/ml-latest-small.zip
-- **Solução pública:** aguardando criação e publicação.
+- **Solução pública:** https://github.com/oceliasousa/laboratorio-estatistico-movielens
 - **Vídeo (acesso liberado):** aguardando gravação e publicação.
 
 ## Resumo executivo

@@ -32,9 +32,9 @@ Este arquivo separa o que já está implementado do que exige uma ação da auto
 - [x] Preencher nome completo e RA/DRT no `README.md`.
 - [x] Preencher identificação no `RELATORIO.md`.
 - [x] Iniciar o repositório Git local e organizar o histórico em commits.
-- [ ] Criar um repositório público no GitHub ou GitLab.
+- [x] Criar um repositório público no GitHub ou GitLab: [laboratorio-estatistico-movielens](https://github.com/oceliasousa/laboratorio-estatistico-movielens).
 - [x] Registrar núcleo, aplicação e documentação em commits separados.
-- [ ] Substituir o campo do repositório pelo endereço público definitivo.
+- [x] Substituir o campo do repositório pelo endereço público definitivo.
 - [x] Adicionar capturas ou GIF da aplicação ao `README.md`.
 - [x] Inserir a evidência dos testes aprovados no relatório.
 - [x] Inserir capturas atuais das oito telas no README e no relatório.

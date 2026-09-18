@@ -2,6 +2,8 @@
 
 Aplicação Streamlit desenvolvida para a Sistematização de **Matemática e Estatística para Computação**. O projeto transforma mais de 100 mil avaliações reais de filmes em um laboratório de estatística descritiva, simulação, distribuições e regressão.
 
+**Repositório público:** [oceliasousa/laboratorio-estatistico-movielens](https://github.com/oceliasousa/laboratorio-estatistico-movielens)
+
 ## Autora
 
 - **Nome:** Océlia Assis de Sousa
@@ -115,11 +117,11 @@ Antes de gerar o PDF ou a imagem dos testes, instale as dependências auxiliares
 python -m pip install -r requirements-entrega.txt
 ```
 
-Depois de publicar o repositório e o vídeo, gere o arquivo definitivo:
+Depois de publicar o vídeo, gere o arquivo definitivo:
 
 ```bash
 python scripts/gerar_pdf_entrega.py \
-  --repositorio "URL_PUBLICA_DO_REPOSITORIO" \
+  --repositorio "https://github.com/oceliasousa/laboratorio-estatistico-movielens" \
   --video "URL_PUBLICA_OU_NAO_LISTADA_DO_VIDEO"
 ```
 
@@ -134,7 +136,7 @@ Os ajustes contínuos são aproximações de variáveis discretizadas. O primeir
 
 ## O que falta para entregar
 
-Publicar um repositório público, gravar/publicar o vídeo de 3 a 5 minutos,
-informar os dois links e gerar o PDF definitivo. Depois, verificar o acesso aos links
+Gravar/publicar o vídeo de 3 a 5 minutos, informar seu link e gerar o PDF definitivo
+com os links do repositório e do vídeo. Depois, verificar o acesso aos links
 em janela anônima e anexar o PDF no ambiente da disciplina dentro do prazo.
-Veja [CHECKLIST_ENTREGA.md](CHECKLIST_ENTREGA.md). Nenhuma publicação foi realizada automaticamente.
+Veja [CHECKLIST_ENTREGA.md](CHECKLIST_ENTREGA.md).
