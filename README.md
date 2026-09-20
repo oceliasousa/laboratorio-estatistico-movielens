@@ -84,13 +84,12 @@ sistematizacao/
 
 ![Resultado dos testes automatizados](docs/images/testes-pytest.png)
 
-Capturas atualizadas após a revisão dos cálculos em 13/09/2026:
+Capturas das telas
 
 ![Tela inicial](docs/images/inicio.png)
 ![Estatística descritiva](docs/images/descritiva.png)
 ![Frequências e moda categórica próprias](docs/images/descritiva-categorica.png)
 ![Correlação e regressão](docs/images/regressao.png)
-
 As oito telas estão documentadas no [relatório](RELATORIO.md).
 
 ## Onde editar
@@ -99,44 +98,8 @@ Textos de cada tela: `src/paginas/`. Cabeçalho, navegação e rodapé: `src/ui/
 Mensagens de carregamento: `src/ui/carregamento.py`. Cores e dimensões: `styles.css`.
 Fórmulas: `src/minhastats.py`; análises reutilizáveis: `src/analises.py`.
 
-## Vídeo
-
-**Link da demonstração (3–5 min):** aguardando gravação e publicação.
-
-## PDF de entrega
-
-Uma prévia é gerada sem os links externos:
-
-```bash
-python scripts/gerar_pdf_entrega.py
-```
-
-Antes de gerar o PDF ou a imagem dos testes, instale as dependências auxiliares:
-
-```bash
-python -m pip install -r requirements-entrega.txt
-```
-
-Depois de publicar o vídeo, gere o arquivo definitivo:
-
-```bash
-python scripts/gerar_pdf_entrega.py \
-  --repositorio "https://github.com/oceliasousa/laboratorio-estatistico-movielens" \
-  --video "URL_PUBLICA_OU_NAO_LISTADA_DO_VIDEO"
-```
-
-O arquivo final será salvo em
-`output/pdf/SISTEMATIZACAO_MEC_OceliaAssisDeSousa.pdf`.
-
 ## Aviso analítico
 
 Os resultados descrevem apenas esta amostra do MovieLens. Associação estatística não demonstra causalidade.
 Os ajustes contínuos são aproximações de variáveis discretizadas. O primeiro gênero listado
 é uma convenção, não uma classificação principal oficial. A licença original acompanha `data/README.txt`.
-
-## O que falta para entregar
-
-Gravar/publicar o vídeo de 3 a 5 minutos, informar seu link e gerar o PDF definitivo
-com os links do repositório e do vídeo. Depois, verificar o acesso aos links
-em janela anônima e anexar o PDF no ambiente da disciplina dentro do prazo.
-Veja [CHECKLIST_ENTREGA.md](CHECKLIST_ENTREGA.md).
