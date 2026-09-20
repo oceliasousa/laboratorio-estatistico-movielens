@@ -84,7 +84,7 @@ sistematizacao/
 
 ![Resultado dos testes automatizados](docs/images/testes-pytest.png)
 
-Capturas das telas
+Capturas de tela
 
 ![Tela inicial](docs/images/inicio.png)
 ![Estatística descritiva](docs/images/descritiva.png)
