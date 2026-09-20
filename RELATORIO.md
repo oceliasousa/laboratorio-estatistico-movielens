@@ -102,13 +102,7 @@ Comando de validação:
 pytest
 ```
 
-Resultado da revisão em 13/09/2026: **147 testes aprovados**. O detalhamento e o ambiente estão em [docs/VALIDACAO.md](docs/VALIDACAO.md). A suíte inclui testes do núcleo, das análises, da preparação dos dados, das oito rotas e de estados interativos.
-
-A revisão corrigiu uma lacuna da versão anterior: as frequências categóricas e a categoria modal
-ainda eram derivadas de `Pandas.value_counts()`. Agora as contagens, proporções e modas vêm de
-funções próprias. Foram acrescentados 56 testes categóricos e 10 testes de análise/interface,
-incluindo ausentes, empates e verificações que falham se as telas voltarem a usar `value_counts`
-ou histogramas com agregação automática. Os números das três descobertas permaneceram iguais.
+Resultado dos testes: **147 testes aprovados**. O detalhamento e o ambiente estão em [docs/VALIDACAO.md](docs/VALIDACAO.md). A suíte inclui testes do núcleo, das análises, da preparação dos dados, das oito rotas e de estados interativos.
 
 | Grupo validado | Referência |
 |---|---|
@@ -203,15 +197,8 @@ O repositório Git local possui commits separados para o núcleo estatístico e 
 
 Situação dos materiais de entrega:
 
-- **Vídeo:** aguardando gravação e publicação.
 - **Repositório público:** [oceliasousa/laboratorio-estatistico-movielens](https://github.com/oceliasousa/laboratorio-estatistico-movielens).
-- **Capturas da aplicação:** registradas após a refatoração em `docs/images/`.
-
-Depois que o vídeo for publicado, o script `scripts/gerar_pdf_entrega.py` recebe os links do repositório e do vídeo e cria o arquivo definitivo `SISTEMATIZACAO_MEC_OceliaAssisDeSousa.pdf`. A prévia já foi gerada e revisada visualmente.
-
-## 9. Capturas atuais dos módulos
-
-As capturas abaixo foram atualizadas no navegador em 13/09/2026, após a revisão dos cálculos.
+- **Capturas da aplicação:** em `docs/images/`.
 
 ### Início
 
@@ -248,7 +235,3 @@ Estado categórico, com frequências próprias e identificação de todas as cat
 ### Descobertas — módulo 6
 
 ![Descobertas](docs/images/descobertas.png)
-
-## 10. Situação da entrega
-
-Os módulos técnicos, testes e evidências locais estão implementados, e o repositório público está disponível no GitHub. A entrega ainda exige gravação/publicação do vídeo, preenchimento de seu link e geração do PDF definitivo com ambos os links. A autora deve verificar os links em janela anônima, confirmar o prazo no ambiente virtual e efetuar o envio. O enunciado fornecido contém apenas o marcador `[DATA/HORA]`, sem prazo preenchido.
