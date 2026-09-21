@@ -7,7 +7,7 @@ import streamlit as st
 from src import minhastats as ms
 from src.dados import CATEGORICAS, NUMERICAS_ANALISE
 from src.analises import valores_numericos, interpretar_assimetria
-from src.analises import tabela_frequencias, tabela_categorica, resumo_iqr
+from src.analises import tabela_frequencias, tabela_categorica, resumo_iqr, classes_sturges
 from src.ui.formatacao import formatar
 from src.ui.layout import cabecalho
 from src.ui.graficos import estilizar, exibir_grafico
@@ -125,7 +125,9 @@ def pagina_descritiva(dados):
     with esquerda:
         with st.container(border=True, key="equal_card_descritiva_frequencia"):
             st.markdown("### Tabela de Frequência")
-            bins = st.slider("Número de classes", 5, 30, 10)
+            padrao = classes_sturges(len(valores))
+            bins = st.slider("Número de classes", 1, max(30, padrao), padrao)
+            st.caption(f"Regra de Sturges: {padrao} classes para {len(valores):,} valores válidos. Ajuste para comparar.")
             classes = tabela_frequencias(valores, bins)
             frequencias, limites = classes.contagens, classes.limites
             tabela = pd.DataFrame(

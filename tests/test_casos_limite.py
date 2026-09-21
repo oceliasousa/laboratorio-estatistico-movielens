@@ -62,3 +62,13 @@ def test_regressao_negativa_e_predicao():
     referencia = stats.linregress(x, y)
     assert (b, a, r2) == pytest.approx((referencia.slope, referencia.intercept, referencia.rvalue**2), **TOL)
     assert a + b * 3 == pytest.approx(4)
+
+
+def test_cv_avisa_cancelamento_sem_confundir_escala_pequena():
+    with pytest.warns(RuntimeWarning, match='próxima de zero'):
+        assert ms.coeficiente_variacao([-1, 1 + 1e-12]) > 1e12
+    # Mudar a unidade de medida não deve tornar o CV instável.
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        assert ms.coeficiente_variacao([1e-14, 2e-14, 3e-14]) == pytest.approx(50)

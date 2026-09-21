@@ -23,7 +23,7 @@ def pagina_simulacoes(dados):
     with st.container(border=True):
         c1, c2, c3, c4 = st.columns(4)
         repeticoes = c1.slider("Número de repetições", 1000, 50000, 5000, 1000)
-        tamanho = c2.slider("Tamanho da amostra (n)", 5, 300, 30)
+        tamanho = c2.slider("Tamanho da amostra (n)", 2, 300, 30)
         coluna = c3.selectbox("Variável para o TCL", NUMERICAS_ANALISE)
         semente = c4.number_input(
             "Semente", min_value=0, max_value=99999, value=123
@@ -86,5 +86,6 @@ def pagina_simulacoes(dados):
     st.info(
         "A Lei dos Grandes Números mostra a convergência da frequência para 0,5. "
         "No TCL, a distribuição das médias amostrais se aproxima de uma Normal "
-        "conforme o tamanho da amostra cresce."
+        "conforme o tamanho da amostra cresce. Compare n = 2, 30 e 100 para ano_filme: "
+        "as médias suavizam a assimetria presente na distribuição dos anos."
     )

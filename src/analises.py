@@ -3,7 +3,7 @@
 from src import minhastats as ms
 from dataclasses import dataclass
 from bisect import bisect_right
-from math import exp, pi, sqrt
+from math import ceil, exp, log10, pi, sqrt
 
 import numpy as np
 import pandas as pd
@@ -46,6 +46,13 @@ class Frequencias:
     def densidades(self):
         total = sum(self.contagens)
         return [n / (total * largura) for n, largura in zip(self.contagens, self.larguras)]
+
+
+def classes_sturges(n):
+    """k = ceil(1 + 3,322 log10(n)); requer quantidade inteira positiva."""
+    if not isinstance(n, int) or isinstance(n, bool) or n < 1:
+        raise ValueError("Sturges exige uma quantidade inteira positiva.")
+    return ceil(1 + 3.322 * log10(n))
 
 
 def tabela_frequencias(valores, classes=10):

@@ -98,15 +98,15 @@ def pagina_sobre(dados=None):
                 "(https://grouplens.org/datasets/movielens/latest/)"
             )
             st.caption(
-                "README.md, RELATORIO.md, roteiro do vídeo e checklist estão na raiz do projeto."
+                "README.md e RELATORIO.md estão na raiz do projeto."
             )
             st.markdown("### Validação")
             st.markdown(
                 "- Execute `pytest -q` para validar o núcleo estatístico.\n"
                 "- Moda categórica: todos os empates são preservados. Ausentes entram no total como categoria separada.\n"
-                "- Consulte `docs/VALIDACAO.md` para o resultado registrado da validação."
+                "- Consulte `RELATORIO.md` para os resultados e as diferenças numéricas da validação."
             )
             from src.config import RAIZ
-            for nome in ("README.md", "RELATORIO.md", "CHECKLIST_ENTREGA.md"):
+            for nome in ("README.md", "RELATORIO.md"):
                 st.download_button(f"Baixar {nome}", (RAIZ / nome).read_text(encoding="utf-8"),
                                    file_name=nome, mime="text/markdown")

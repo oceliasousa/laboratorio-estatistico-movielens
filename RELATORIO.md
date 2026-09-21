@@ -6,6 +6,7 @@
 - **RA/DRT:** 72650579
 - **Modalidade:** trabalho individual
 - **Disciplina:** Matemática e Estatística para Computação
+- **Repositório:** [laboratorio-estatistico-movielens](https://github.com/oceliasousa/laboratorio-estatistico-movielens)
 - **Dataset:** [MovieLens Latest Small — dados crus oficiais](https://files.grouplens.org/datasets/movielens/ml-latest-small.zip)
 
 ## 2. Dataset e justificativa
@@ -14,7 +15,7 @@ O MovieLens foi escolhido por ser público, documentado e representar comportame
 
 A unidade de análise é uma avaliação. Os dados originais (`ratings.csv` e `movies.csv`) são unidos por `movieId`. Foram derivadas as variáveis ano do filme, ano da avaliação, gênero principal, quantidade de gêneros e faixa de avaliação. IDs são disponibilizados para exploração, mas devem ser interpretados como identificadores, não como grandezas quantitativas.
 
-As variáveis usadas diretamente nas análises atendem aos requisitos mínimos:
+A base preparada oferece as seguintes variáveis para análise, incluindo as derivações descritas acima:
 
 | Tipo | Variáveis |
 |---|---|
@@ -24,6 +25,10 @@ As variáveis usadas diretamente nas análises atendem aos requisitos mínimos:
 A base preparada possui **100.836 registros**, **11 colunas**, **4 variáveis categóricas** e **7 colunas numéricas** no total. Identificadores e timestamp permanecem disponíveis para rastreabilidade, mas não são tratados como grandezas nas interpretações estatísticas.
 
 O marcador `(no genres listed)` significa ausência de gênero listado. Para `quantidade_generos`, ele recebe **zero**, e não um: são 47 avaliações de 34 filmes. O campo categórico preserva o marcador original. O cache é invalidado quando mudam os CSVs ou as regras de preparação.
+
+### Tratamento dos valores ausentes
+
+Há **18 avaliações sem ano do filme** extraível do título (aproximadamente 0,018% da base). `pd.to_numeric(..., errors="coerce")` mantém esses anos como ausentes. Não há imputação: as avaliações permanecem na base e participam das análises de nota, gênero e ano da avaliação. Ao analisar `ano_filme`, são removidas somente as observações sem esse valor; a regressão ano × nota usa **100.818 pares válidos**. O mesmo critério de remoção por variável é aplicado às simulações e distribuições. A junção é validada como muitos-para-um e rejeita avaliações sem filme correspondente.
 
 ## 3. Núcleo estatístico próprio
 
@@ -73,6 +78,8 @@ Os desvios padrão são as raízes das respectivas variâncias. O coeficiente de
 
 $$CV=\frac{s}{|\bar{x}|}\times100\%$$
 
+O módulo da média mantém o CV não negativo, inclusive para entradas com média negativa. Média zero é recusada. Quando $|\bar{x}| \leq 10^{-10}\max_i|x_i|$, a função emite `RuntimeWarning` sobre instabilidade por cancelamento; o limiar é relativo à escala, evitando confundir números pequenos com média próxima de zero em relação aos dados. O CV é apenas didático para anos e notas, que não possuem zero absoluto.
+
 ### Percentis e quartis
 
 Para percentil \(p\), ordenam-se os dados e calcula-se \(h=(n-1)p/100\). Quando \(h\) não é inteiro, usa-se interpolação linear entre as posições vizinhas. Os quartis são \(P_{25}\), \(P_{50}\) e \(P_{75}\). Outliers ficam abaixo de \(Q_1-1{,}5IQR\) ou acima de \(Q_3+1{,}5IQR\), com \(IQR=Q_3-Q_1\).
@@ -102,19 +109,49 @@ Comando de validação:
 pytest
 ```
 
-Resultado dos testes: **147 testes aprovados**. O detalhamento e o ambiente estão em [docs/VALIDACAO.md](docs/VALIDACAO.md). A suíte inclui testes do núcleo, das análises, da preparação dos dados, das oito rotas e de estados interativos.
+Resultado da revisão de 21/09/2026: **149 testes aprovados**. A suíte inclui núcleo, análises, preparação dos dados, oito rotas, estados categóricos, Sturges, TCL com n = 2 e o aviso de CV instável. A tela Sobre disponibiliza somente os documentos existentes, README e relatório.
 
-| Grupo validado | Referência |
-|---|---|
-| Média, mediana, amplitude, variâncias e desvios | NumPy |
-| Moda, incluindo empates | SciPy e `statistics.multimode` |
-| Frequências e moda categóricas, incluindo ausentes e empates | Pandas e `statistics.multimode` |
-| Frequências relativas e acumuladas | NumPy |
-| Percentis e quartis | NumPy |
-| Coeficiente de variação | SciPy |
-| Covariância e correlação de Pearson | NumPy e SciPy |
-| Regressão linear e R² | SciPy/NumPy |
-| Frequências e densidades Normal, Exponencial e Uniforme próprias | NumPy e SciPy |
+Ambiente: Python 3.9, Streamlit 1.50.0, Pandas 2.3.3, NumPy 2.0.2, SciPy 1.13.1, Plotly 6.9.0 e pytest 8.4.2. A validação foi executada no ambiente virtual local; não cobre todas as combinações de sistemas e versões.
+
+### Comparação numérica reproduzível
+
+A tabela abaixo é produzida por `python scripts/validar_numeros.py`. O vetor numérico é `[1.2, 2.5, 2.5, 4.1, 8.0, -1.3]`; os pares são X = `[1, 2, 3, 4, 5, 6]` e Y = `[2.1, 3.9, 6.2, 7.8, 10.1, 12.2]`. Para categorias, usam-se `[1, 2, 2, 3, 3, 3]`. Histogramas usam cinco classes e densidades teóricas são comparadas em 100 pontos entre −3 e 10. A diferença informada é o máximo absoluto entre os componentes de cada resultado, nesses exemplos, não em toda a suíte.
+
+Para valores numéricos, aceita-se diferença de até `max(1e-12, 1e-10 × |referência|)`. Contagens e modas exigem igualdade exata.
+
+| Função / resultado | Referência | Maior diferença absoluta | Tolerância |
+|---|---|---:|---|
+| media | NumPy.mean | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| mediana | NumPy.median | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| amplitude | NumPy.ptp | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| variancia_populacional | NumPy.var(ddof=0) | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| variancia_amostral | NumPy.var(ddof=1) | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| desvio_padrao_populacional | NumPy.std(ddof=0) | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| desvio_padrao_amostral | NumPy.std(ddof=1) | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| coeficiente_variacao | SciPy.variation(ddof=1) × 100 | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| quartis | NumPy.percentile(25,50,75) | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| moda | statistics.multimode | 0.000e+00 | Exata |
+| percentil | NumPy.percentile | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| covariancia (amostral=False) | NumPy.cov(ddof=0) | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| covariancia (amostral=True) | NumPy.cov(ddof=1) | 8.882e-16 | rel=1e-10; abs=1e-12 |
+| correlacao_pearson | SciPy.pearsonr | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| regressao_linear: inclinação | SciPy.linregress.slope | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| regressao_linear: intercepto | SciPy.linregress.intercept | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| regressao_linear: R² | SciPy.linregress.rvalue² | 2.220e-16 | rel=1e-10; abs=1e-12 |
+| frequencias_categoricas | NumPy.unique(return_counts) | 0.000e+00 | Exata |
+| moda_categorica | statistics.multimode | 0.000e+00 | Exata |
+| frequencias_relativas | NumPy: contagens / soma | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| frequencias_acumuladas | NumPy.cumsum | 0.000e+00 | Exata |
+| tabela_frequencias | NumPy.histogram | 0.000e+00 | Exata |
+| densidades do histograma | NumPy.histogram(density=True) | 1.388e-17 | rel=1e-10; abs=1e-12 |
+| Densidade Normal | SciPy: Normal | 2.776e-17 | rel=1e-10; abs=1e-12 |
+| Densidade Exponencial | SciPy: Exponencial | 0.000e+00 | rel=1e-10; abs=1e-12 |
+| Densidade Uniforme | SciPy: Uniforme | 0.000e+00 | rel=1e-10; abs=1e-12 |
+
+
+### Cobertura adicional
+
+Os testes também incluem dados aleatórios com semente fixa, amostras unitárias, constantes, vazias, tipos inválidos, NaN, infinito, iteradores, pares de tamanhos diferentes, empates de moda e categorias ausentes. As telas são verificadas com `value_counts` e `px.histogram` bloqueados para detectar delegação indevida de contagens a bibliotecas. Simulações usam margens próprias para resultados aleatórios; a comparação da correlação publicada usa tolerância de arredondamento de `1e-4`.
 
 Além dos testes do núcleo, as oito rotas da interface (`inicio`, `descritiva`, `simulacoes`, `distribuicoes`, `regressao`, `descobertas`, `dados` e `sobre`) foram executadas com o mecanismo de testes do Streamlit e não apresentaram exceções.
 
@@ -134,13 +171,15 @@ Documenta todas as funções estatísticas exigidas, as bibliotecas usadas como 
 
 O usuário seleciona uma variável. Para numéricas, vê as medidas próprias, frequências em classes, histograma, boxplot, assimetria de Pearson e outliers por IQR. Para categóricas, vê frequências absoluta/relativa, todas as categorias modais e gráfico de barras, calculados pelas funções próprias.
 
+O número inicial de classes segue Sturges: $k=\lceil1+3{,}322\log_{10}(n)\rceil$, com $n$ igual à quantidade de valores válidos. Para as 100.836 notas, são **18 classes**. O usuário pode ajustar esse número para comparar a granularidade.
+
 Tabela e histograma compartilham a mesma contagem própria e as mesmas bordas: classes fechadas à esquerda e abertas à direita, exceto a última, fechada dos dois lados. O boxplot recebe Q1, mediana, Q3 e bigodes já calculados pelo núcleo. A tabela categórica inclui todas as categorias; somente o gráfico limita a visualização às 20 mais frequentes. Para `rating`, Q1 = 3, Q3 = 4 e IQR = 1: há **4.181 observações** abaixo do limite inferior 1,5.
 
 ### Módulo 3 — Simulação
 
 Na Lei dos Grandes Números, lançamentos de moeda mostram a frequência de caras convergindo para 0,5. No TCL, amostras com reposição de uma variável geram médias calculadas pelo núcleo próprio; tamanho, repetições e semente são controláveis.
 
-A referência do TCL usa a média da população empírica e seu desvio populacional dividido por √n, em vez de ajustar a curva às próprias médias simuladas. Os resultados da simulação ficam em cache por dados e parâmetros. A proximidade da Normal pode ser examinada repetindo a simulação com n = 5, 30 e 100; não é uma garantia de aproximação perfeita para toda amostra.
+A referência do TCL usa a média da população empírica e seu desvio populacional dividido por √n, em vez de ajustar a curva às próprias médias simuladas. Os resultados da simulação ficam em cache por dados e parâmetros. A proximidade da Normal pode ser examinada repetindo a simulação com n = 2, 30 e 100 para `ano_filme`, cuja distribuição apresenta concentração nos anos mais recentes e cauda em direção aos filmes antigos; não é uma garantia de aproximação perfeita para toda amostra.
 
 ### Módulo 4 — Distribuições
 
@@ -153,6 +192,12 @@ $$f_N(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac12((x-\mu)/\sigma)^2}$$
 $$f_E(x)=\frac{1}{\theta}e^{-(x-a)/\theta},\ x\ge a;\qquad f_U(x)=\frac{1}{b-a},\ a\le x\le b$$
 
 Fora do suporte, as densidades Exponencial e Uniforme são zero. Na Normal, μ e σ vêm do núcleo. Na Exponencial deslocada, a é o mínimo e θ é a média de x − a. Na Uniforme, a e b são os extremos observados. Essas curvas aproximam variáveis discretas/discretizadas; não implicam que notas ou anos sejam tempos de espera ou medidas contínuas.
+
+#### Discussão do ajuste às notas
+
+Para `rating`, a Normal estimada tem **μ = 3,5016** e **σ = 1,0425**. Ela descreve um centro próximo de 3,5, mas não representa os saltos de meia estrela nem os limites da escala: atribui probabilidade a valores abaixo de 0,5 e acima de 5. A aparência muda com a largura das classes, pois os dados são discretos.
+
+A Uniforme entre 0,5 e 5 pressupõe densidade constante. Isso contrasta com a concentração de **81,09%** das observações entre 3 e 5. A Exponencial deslocada, com localização 0,5 e escala **3,0016**, atinge sua maior densidade na menor nota e decresce, enquanto os dados se concentram em notas mais altas. Essas duas candidatas não reproduzem a concentração observada. A Normal também não é um modelo exato: nenhuma das curvas contínuas substitui as frequências das notas. A conclusão é exploratória, sem teste formal de aderência ou declaração de uma distribuição vencedora.
 
 ### Módulo 5 — Correlação e regressão
 
@@ -176,7 +221,7 @@ Considerando o primeiro gênero listado, **Ação possui 30.635 avaliações** e
 
 A correlação de Pearson entre ano do filme e nota é **−0,0840**. O sinal é levemente negativo, mas a magnitude é muito pequena: uma regressão simples baseada apenas no ano tem poder explicativo baixo.
 
-Na regressão de ano do filme para nota, **R² = 0,007064**, aproximadamente **0,71%** da variação das notas. Essas três descobertas são as mesmas apresentadas na tela Relatório de Descobertas e no resumo executivo.
+Na regressão de ano do filme para nota, **R² = 0,007064**, aproximadamente **0,71%** da variação das notas. Essas três descobertas são as mesmas apresentadas na tela Relatório de Descobertas.
 
 ## 7. Limitações e ética
 
@@ -199,6 +244,10 @@ Situação dos materiais de entrega:
 
 - **Repositório público:** [oceliasousa/laboratorio-estatistico-movielens](https://github.com/oceliasousa/laboratorio-estatistico-movielens).
 - **Capturas da aplicação:** em `docs/images/`.
+
+## 9. Capturas dos módulos
+
+As capturas da aplicação foram registradas em 13/09/2026. Na revisão de 21/09/2026, a descritiva passou a iniciar com Sturges, o TCL passou a aceitar n = 2 e a tela Sobre deixou de oferecer o checklist removido. Portanto, as imagens documentam a interface anterior a esses ajustes; a imagem dos testes registra a execução atual. Testes de integração não substituem uma revisão visual completa no navegador.
 
 ### Início
 
@@ -235,3 +284,7 @@ Estado categórico, com frequências próprias e identificação de todas as cat
 ### Descobertas — módulo 6
 
 ![Descobertas](docs/images/descobertas.png)
+
+## 10. Escopo desta versão
+
+A documentação é composta pelo README e por este relatório, acompanhados de código, dados, testes e capturas. Por decisão da autora, esta versão não inclui vídeo de demonstração nem PDF de envio. Isso delimita os materiais disponibilizados; os entregáveis previstos no guia que não foram produzidos não são declarados como concluídos.

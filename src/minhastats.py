@@ -8,6 +8,7 @@ aceitam categorias hashable; None e NaN formam uma categoria ausente única.
 
 from math import fsum, isfinite, isnan, sqrt
 from numbers import Integral, Real
+import warnings
 
 
 def _valores(dados):
@@ -149,10 +150,14 @@ def quartis(dados):
 
 
 def coeficiente_variacao(dados, amostral=True):
+    """CV não negativo; avisa se |média| <= 1e-10 vezes a maior magnitude."""
     valores = _valores(dados)
     centro = media(valores)
     if centro == 0:
         raise ValueError("O coeficiente de variação não é definido para média zero.")
+    if abs(centro) <= 1e-10 * max(abs(x) for x in valores):
+        warnings.warn("Média próxima de zero em relação aos dados: CV instável.",
+                      RuntimeWarning, stacklevel=2)
     desvio = desvio_padrao_amostral(valores) if amostral else desvio_padrao_populacional(valores)
     return desvio / abs(centro) * 100
 

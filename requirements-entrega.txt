@@ -1,5 +1,3 @@
-reportlab>=4.0,<6
-pypdf>=5,<7
-pdfplumber>=0.11,<1
+# Opcional: apenas para gerar docs/images/testes-pytest.png.
+# Instale requirements.txt primeiro. A aplicação não exige este arquivo.
 pillow>=10,<12
-pypdfium2>=4,<6

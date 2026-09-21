@@ -44,7 +44,7 @@ def quebrar_texto(texto: str, largura: int = 102) -> list[str]:
 
 def main() -> int:
     processo = subprocess.run(
-        [sys.executable, "-m", "pytest", "-rA"],
+        [sys.executable, "-m", "pytest", "-o", "addopts=", "-q"],
         cwd=RAIZ,
         capture_output=True,
         text=True,
@@ -77,7 +77,7 @@ def main() -> int:
     corpo = fonte(25)
     pequeno = fonte(21)
     desenho.text((235, 92), "LabEstat - validação automatizada", font=titulo, fill="#eef7ff")
-    desenho.text((110, 198), "$ python -m pytest -rA", font=corpo, fill="#35e7d0")
+    desenho.text((110, 198), '$ python -m pytest -o addopts="" -q', font=corpo, fill="#35e7d0")
 
     y = 255
     for linha in quebrar_texto(saida_terminal):
@@ -99,6 +99,7 @@ def main() -> int:
     SAIDA.parent.mkdir(parents=True, exist_ok=True)
     imagem.save(SAIDA, optimize=True)
     print(f"Evidência salva em: {SAIDA}")
+    print(saida_completa)
     return processo.returncode
 
 

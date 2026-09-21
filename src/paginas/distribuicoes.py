@@ -66,6 +66,19 @@ def pagina_distribuicoes(dados):
                     "curva e as barras. Diferenças sistemáticas indicam que a candidata "
                     "não descreve completamente os dados."
                 )
+                if coluna == "rating":
+                    leituras = {
+                        "Normal": "Nas notas, a Normal acompanha o centro em torno de 3,5, "
+                                  "mas não representa os saltos de 0,5 estrela e atribui probabilidade "
+                                  "fora da escala de 0,5 a 5. Compare principalmente as extremidades.",
+                        "Exponencial": "A Exponencial deslocada atinge o pico na menor nota (0,5) "
+                                       "e decresce. Isso contrasta com a concentração observada entre "
+                                       "3 e 5 estrelas, indicando uma candidata pouco adequada às notas.",
+                        "Uniforme": "A Uniforme atribui a mesma densidade a toda a escala. "
+                                    "As barras das notas mostram concentração entre 3 e 5 estrelas, "
+                                    "que a curva plana não consegue reproduzir.",
+                    }
+                    st.info(leituras[candidata])
                 st.warning(
                     "A comparação visual é exploratória e não substitui um teste formal de aderência."
                 )

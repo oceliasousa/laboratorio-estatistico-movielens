@@ -93,3 +93,16 @@ def test_regressao_mesma_variavel():
     app.run().selectbox[0].set_value('rating').run()
     assert not app.exception
     assert 'diferentes' in app.error[0].value
+
+
+def test_descritiva_sturges_e_tcl_amostra_pequena():
+    app = AppTest.from_file(APP)
+    app.query_params['page'] = 'descritiva'
+    app.run(timeout=45)
+    assert app.slider[0].value == 18
+    assert len(app.dataframe[-1].value) == 18
+    assert app.dataframe[-1].value['Frequência'].sum() == 100836
+    app.query_params['page'] = 'simulacoes'
+    app.run(timeout=45).slider[1].set_value(2).run(timeout=45)
+    assert not app.error
+    assert not app.exception
