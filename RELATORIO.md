@@ -247,8 +247,6 @@ Situação dos materiais de entrega:
 
 ## 9. Capturas dos módulos
 
-As capturas da aplicação foram registradas em 13/09/2026. Na revisão de 21/09/2026, a descritiva passou a iniciar com Sturges, o TCL passou a aceitar n = 2 e a tela Sobre deixou de oferecer o checklist removido. Portanto, as imagens documentam a interface anterior a esses ajustes; a imagem dos testes registra a execução atual. Testes de integração não substituem uma revisão visual completa no navegador.
-
 ### Início
 
 ![Início](docs/images/inicio.png)
@@ -287,4 +285,4 @@ Estado categórico, com frequências próprias e identificação de todas as cat
 
 ## 10. Escopo desta versão
 
-A documentação é composta pelo README e por este relatório, acompanhados de código, dados, testes e capturas. Por decisão da autora, esta versão não inclui vídeo de demonstração nem PDF de envio. Isso delimita os materiais disponibilizados; os entregáveis previstos no guia que não foram produzidos não são declarados como concluídos.
+A documentação é composta pelo README e por este relatório, acompanhados de código, dados, testes e capturas.

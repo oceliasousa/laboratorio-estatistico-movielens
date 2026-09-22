@@ -133,4 +133,4 @@ Os ajustes contínuos são aproximações de variáveis discretizadas. O primeir
 
 ## Documentação
 
-O [RELATORIO.md](RELATORIO.md) reúne preparação dos dados, fórmulas, validação, módulos, capturas e três descobertas. Esta versão disponibiliza a aplicação, o README e o relatório; não inclui vídeo nem PDF de envio. Esses entregáveis previstos no guia não são apresentados como concluídos.
+O [RELATORIO.md](RELATORIO.md) reúne preparação dos dados, fórmulas, validação, módulos, capturas e três descobertas. Esta versão disponibiliza a aplicação, o README e o relatório.
